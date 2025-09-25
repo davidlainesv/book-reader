@@ -1,0 +1,902 @@
+
+'use client';
+
+import dynamic from 'next/dynamic';
+
+// Use dynamic import to avoid hydration mismatch issues
+// since the BookReaderApp uses client-side APIs like window and document
+const BookReaderAppDynamic = dynamic(
+  () => import('./book-reader/BookReaderApp'),
+  { ssr: false }
+);
+
+export default function BookReaderApp() {
+  return <BookReaderAppDynamic />;
+}
+
+// ------------------------------------------------------
+// Sample book with per-chapter chatbot + form (5 questions)
+// ------------------------------------------------------
+const sampleBook = {
+    id: "alice-in-wonderland",
+    title: "Alice's Adventures in Wonderland (Sample)",
+    author: "Lewis Carroll",
+    year: 1865,
+    chapters: [
+        {
+            title: "Chapter 1 — Down the Rabbit-Hole",
+            content: `Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, “and what is the use of a book,” thought Alice “without pictures or conversations?”
+
+So she was considering in her own mind (as well as she could, for the hot day made her feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be worth the trouble of getting up and picking the daisies, when suddenly a White Rabbit with pink eyes ran close by her.
+
+There was nothing so very remarkable in that; nor did Alice think it so very much out of the way to hear the Rabbit say to itself, “Oh dear! Oh dear! I shall be late!” (when she thought it over afterwards, it occurred to her that she ought to have wondered at this, but at the time it all seemed quite natural); but when the Rabbit actually took a watch out of its waistcoat-pocket, and looked at it, and then hurried on, Alice started to her feet, for it flashed across her mind that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it, and burning with curiosity, she ran across the field after it, and fortunately was just in time to see it pop down a large rabbit-hole under the hedge.`,
+            chatbot: {
+                persona: "You are a friendly literature guide: warm, concise, and Socratic.",
+                instruction: "Focus on Chapter 1's curiosity, the rabbit, and Alice's motivations. Ask an open question and invite evidence from the text.",
+            } as ChatbotConfig,
+            form: {
+                fields: [
+                    { type: "text", id: "c1-q1", label: "In one sentence, summarize this chapter.", placeholder: "Your summary…" },
+                    { type: "number", id: "c1-q2", label: "Rate Alice's curiosity (1–10)", min: 1, max: 10 },
+                    { type: "select", id: "c1-q3", label: "Which theme is strongest?", options: ["Curiosity", "Adventure", "Confusion", "Innocence"] },
+                    { type: "checkboxes", id: "c1-q4", label: "Which events stood out? (select all)", options: ["White Rabbit", "Watch", "Rabbit-hole", "Field chase"] },
+                    { type: "text", id: "c1-q5", label: "Any questions you still have?", multiline: true, placeholder: "Write your questions…" },
+                ] as Field[],
+            },
+        },
+        {
+            title: "Chapter 2 — The Pool of Tears",
+            content: `“Curiouser and curiouser!” cried Alice (she was so much surprised, that for the moment she quite forgot how to speak good English); “now I'm opening out like the largest telescope that ever was! Good-bye, feet!” (for when she looked down at her feet, they seemed to be almost out of sight, they were getting so far off). “Oh, my poor little feet, I wonder who will put on your shoes and stockings for you now, dears? I'm sure I shan't be able! I shall be a great deal too far off to trouble myself about you: you must manage the best way you can;—but I must be kind to them,” thought Alice, “or perhaps they won't walk the way I want to go!”`,
+            chatbot: {
+                persona: "You are a supportive study coach: empathetic, concise, and curious.",
+                instruction: "Discuss identity shifts and emotions in Chapter 2. Ask brief, open questions and encourage reflection.",
+            } as ChatbotConfig,
+            form: {
+                fields: [
+                    { type: "text", id: "c2-q1", label: "Describe Alice's emotional state.", placeholder: "Your thoughts…" },
+                    { type: "number", id: "c2-q2", label: "How confusing was this chapter? (1–10)", min: 1, max: 10 },
+                    { type: "select", id: "c2-q3", label: "Pick a symbol", options: ["Tears", "Telescope", "Feet", "Size changes"] },
+                    { type: "checkboxes", id: "c2-q4", label: "What does identity mean here?", options: ["Name", "Body size", "Feelings", "Memories"] },
+                    { type: "text", id: "c2-q5", label: "A quote that resonated (paste it)", multiline: true, placeholder: "Paste the quote…" },
+                ] as Field[],
+            },
+        },
+        {
+            title: "Chapter 3 — A Caucus-Race and a Long Tale",
+            content: `“What I was going to say,” said the Dodo in an offended tone, “was, that the best thing to get us dry would be a Caucus-race.”
+
+“What is a Caucus-race?” said Alice; not that she wanted much to know, but the Dodo had paused as if it thought that somebody ought to speak...`,
+            chatbot: {
+                persona: "You are a critical thinking guide: analytical, concise, and encouraging.",
+                instruction: "Explore satire and social commentary in Chapter 3. Ask for concrete examples from the text.",
+            } as ChatbotConfig,
+            form: {
+                fields: [
+                    { type: "text", id: "c3-q1", label: "What is the joke or satire here?", placeholder: "Your interpretation…" },
+                    { type: "number", id: "c3-q2", label: "How satirical? (1–10)", min: 1, max: 10 },
+                    { type: "select", id: "c3-q3", label: "Closest modern analogy", options: ["Political rally", "Corporate meeting", "School event"] },
+                    { type: "checkboxes", id: "c3-q4", label: "Devices you noticed", options: ["Irony", "Parody", "Hyperbole", "Wordplay"] },
+                    { type: "text", id: "c3-q5", label: "Evidence from the text", multiline: true, placeholder: "Add a line or two…" },
+                ] as Field[],
+            },
+        },
+        {
+            title: "Chapter 4 — The Rabbit Sends in a Little Bill",
+            content: `It was the White Rabbit, trotting slowly back again, and looking anxiously about as it went, as if it had lost something; and she heard it muttering to itself “The Duchess! The Duchess! Oh my dear paws! Oh my fur and whiskers! She'll get me executed, as sure as ferrets are ferrets!”`,
+            chatbot: {
+                persona: "You are a character motivations analyst: probing, concise, and scaffolded.",
+                instruction: "Focus on the Rabbit's urgency and Alice's reactions in Chapter 4. Guide the reader with stepwise questions.",
+            } as ChatbotConfig,
+            form: {
+                fields: [
+                    { type: "text", id: "c4-q1", label: "What does the Rabbit fear?", placeholder: "Your view…" },
+                    { type: "number", id: "c4-q2", label: "How urgent is the tone? (1–10)", min: 1, max: 10 },
+                    { type: "select", id: "c4-q3", label: "Alice's response is mostly…", options: ["Brave", "Naive", "Cautious", "Impulsive"] },
+                    { type: "checkboxes", id: "c4-q4", label: "What drives the action?", options: ["Time pressure", "Curiosity", "Authority", "Fear"] },
+                    { type: "text", id: "c4-q5", label: "Note an important detail", multiline: true, placeholder: "Detail…" },
+                ] as Field[],
+            },
+        },
+    ],
+};
+
+// ------------------------------------------------------
+// Utilities
+// ------------------------------------------------------
+function clamp(n: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, n));
+}
+
+function fontStack(fontFamilySetting: "serif" | "sans" | "mono") {
+    return fontFamilySetting === "serif"
+        ? "ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif"
+        : fontFamilySetting === "sans"
+            ? "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'"
+            : "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+}
+function fontSpec(fontFamilySetting: "serif" | "sans" | "mono", fontSize: number) {
+    return `${fontSize}px ${fontStack(fontFamilySetting)}`;
+}
+function escapeHtml(s: string) {
+    return s
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+// Soft-wrap text into lines using canvas, then group into pages
+function layoutLines(
+    text: string,
+    widthPx: number,
+    font: string,
+    lineHeightPx: number,
+    viewportHeightPx: number
+): string[][] {
+    try {
+        // Safety checks for parameters
+        if (!text || typeof text !== 'string') {
+            console.warn("Invalid text provided to layoutLines:", text);
+            return [["[No content available]"]];
+        }
+        
+        if (widthPx <= 0 || viewportHeightPx <= 0 || lineHeightPx <= 0) {
+            console.warn("Invalid dimensions in layoutLines:", { widthPx, viewportHeightPx, lineHeightPx });
+            return [[text]]; // Return original text as fallback
+        }
+        
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return [[text]];
+        ctx.font = font;
+
+        const linesPerPage = Math.max(1, Math.floor(viewportHeightPx / Math.max(1, lineHeightPx)));
+
+        const paragraphs = text.split(/\n\n+/);
+        const lines: string[] = [];
+
+    for (let p = 0; p < paragraphs.length; p++) {
+        const words = paragraphs[p].split(/\s+/).filter(Boolean);
+        let line = "";
+        for (const w of words) {
+            const trial = line ? line + " " + w : w;
+            if (ctx.measureText(trial).width <= widthPx) {
+                line = trial;
+            } else {
+                if (line) lines.push(line);
+                line = w;
+            }
+        }
+        if (line) lines.push(line);
+        if (p < paragraphs.length - 1) lines.push("");
+    }
+
+    const pages: string[][] = [];
+    
+    // If there are lines, divide them into pages
+    if (lines.length > 0) {
+        for (let i = 0; i < lines.length; i += linesPerPage) {
+            pages.push(lines.slice(i, i + linesPerPage));
+        }
+    } else {
+        // If no lines, add an empty page
+        pages.push([""]);
+    }
+    
+    return pages;
+    } catch (error) {
+        console.error("Error in layoutLines:", error);
+        return [[text || "[Error processing text]"]];
+    }
+}
+
+// Measure how many line slots a form field consumes
+function measureFieldLines(field: Field, ctx: CanvasRenderingContext2D, widthPx: number): number {
+    const measureTextLines = (text: string) => {
+        const words = text.split(/\s+/).filter(Boolean);
+        let line = "";
+        let count = 0;
+        for (const w of words) {
+            const trial = line ? line + " " + w : w;
+            if (ctx.measureText(trial).width <= widthPx) {
+                line = trial;
+            } else {
+                if (line) count++;
+                line = w;
+            }
+        }
+        if (line) count++;
+        return count || 1;
+    };
+
+    const labelLines = measureTextLines(field.label);
+
+    switch (field.type) {
+        case "text":
+            return labelLines + (field.multiline ? 3 : 1) + 1; // +1 for spacing
+        case "number":
+            return labelLines + 1 + 1;
+        case "select":
+            // label + (selected line) + options preview (one per option)
+            return labelLines + 1 + Math.max(1, field.options.length) + 1;
+        case "checkboxes":
+            return labelLines + Math.max(1, field.options.length) + 1;
+    }
+}
+
+// Lay out form into multiple pages according to available line slots
+function layoutFormPages(fields: Field[], widthPx: number, font: string, lineHeightPx: number, viewportHeightPx: number): Page[] {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return [{ type: "form", fields }];
+    ctx.font = font;
+
+    const linesPerPage = Math.max(1, Math.floor(viewportHeightPx / Math.max(1, lineHeightPx)));
+
+    const pages: Page[] = [];
+    let bucket: Field[] = [];
+    let used = 0;
+
+    for (const f of fields) {
+        const need = measureFieldLines(f, ctx, widthPx);
+        if (used + need > linesPerPage && bucket.length) {
+            pages.push({ type: "form", fields: bucket });
+            bucket = [];
+            used = 0;
+        }
+        bucket.push(f);
+        used += Math.min(need, linesPerPage); // cap to avoid single item overflow
+    }
+    if (bucket.length) pages.push({ type: "form", fields: bucket });
+    return pages.length ? pages : [{ type: "form", fields }];
+}
+
+// ------------------------------------------------------
+// GPT helpers (streaming with fallback)
+// ------------------------------------------------------
+async function callLLM(systemPrompt: string, convo: ChatMsg[]): Promise<string> {
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ system: systemPrompt, messages: convo }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const text = data.reply || data.message || data.text;
+        if (typeof text === "string" && text.trim()) return text.trim();
+        throw new Error("Unexpected response shape");
+    } catch (err) {
+        const lastUser = [...convo].reverse().find((m) => m.role === "user")?.content ?? "";
+        return lastUser ? `Thanks! On ${lastUser.slice(0, 60)}… what evidence in the text supports that?` : "What part of the chapter felt most important to you?";
+    }
+}
+
+async function callLLMStream(systemPrompt: string, convo: ChatMsg[], onToken: (t: string) => void): Promise<void> {
+    try {
+        const res = await fetch("/api/chat/stream", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ system: systemPrompt, messages: convo, stream: true }),
+        });
+        if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            // Support either raw text or SSE-like 'data:' lines
+            chunk.split(/\n/).forEach((line) => {
+                const trimmed = line.replace(/^data:\s*/, "");
+                if (!trimmed) return;
+                onToken(trimmed);
+            });
+        }
+    } catch (e) {
+        // Fall back to non-streaming single reply
+        const reply = await callLLM(systemPrompt, convo);
+        onToken(reply);
+    }
+}
+
+function buildSystemPrompt(config: ChatbotConfig, chapterTitle: string): string {
+    if (config.systemPrompt && config.systemPrompt.trim()) return config.systemPrompt.trim();
+    const persona = config.persona || "You are a friendly literature guide: warm, concise, Socratic.";
+    const instruction = config.instruction || `Discuss ${chapterTitle}. Ask short, open questions and encourage evidence from the text.`;
+    return [
+        persona,
+        `Instructions: ${instruction}`,
+        "Style: concise, upbeat, and curious. Always end with a question to invite the reader to respond.",
+    ].join("\n");
+}
+
+// ------------------------------------------------------
+// Chatbot panel (full-page)
+// ------------------------------------------------------
+function ChatbotPanel({
+    chapterIdx,
+    chapterTitle,
+    config,
+    messages,
+    setMessages,
+    fontSize, // Add fontSize prop
+}: {
+    chapterIdx: number;
+    chapterTitle: string;
+    config: ChatbotConfig;
+    messages: ChatMsg[];
+    //setMessages: (updater: (prev: ChatMsg[]) => ChatMsg[] | ChatMsg[]) => void;
+    // setMessages: React.Dispatch<React.SetStateAction<ChatMsg[]>>;
+    setMessages: React.Dispatch<React.SetStateAction<ChatMsg[]>>;
+    fontSize: number; // Add type for fontSize prop
+}) {
+    const [input, setInput] = useState("");
+    const [sending, setSending] = useState(false);
+    const listRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        // Only initialize with a message if we have a valid setMessages function
+        if ((!messages || messages.length === 0) && setMessages) {
+            try {
+                setMessages([{ role: "assistant", content: "What stood out to you most in this chapter?" }]);
+            } catch (err) {
+                console.error("Error initializing chat messages:", err);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    
+    // Update the font size for chatbot content
+    useEffect(() => {
+        document.documentElement.style.setProperty('--reader-font-size', `${fontSize}px`);
+    }, [fontSize]);
+
+    useEffect(() => {
+        listRef.current?.scrollTo({ top: 999999, behavior: "smooth" });
+    }, [messages]);
+
+    const onSend = async () => {
+        const text = input.trim();
+        if (!text || sending) return;
+        setSending(true);
+        const systemPrompt = buildSystemPrompt(config, chapterTitle);
+
+        // add user message
+        setMessages((prev) => [...prev, { role: "user", content: text }]);
+        setInput("");
+
+        // create empty assistant message for streaming
+        let assistantIndex = -1;
+        setMessages((prev) => {
+            assistantIndex = prev.length;
+            return [...prev, { role: "assistant", content: "" }];
+        });
+
+        const convo: ChatMsg[] = [{ role: "assistant", content: systemPrompt }, ...messages, { role: "user", content: text }];
+
+        const appendToken = (tok: string) => {
+            setMessages((prev) => {
+                const copy = [...prev];
+                const last = copy[assistantIndex] || { role: "assistant", content: "" };
+                copy[assistantIndex] = { role: "assistant", content: (last.content || "") + tok };
+                return copy;
+            });
+        };
+
+        await callLLMStream(systemPrompt, convo, appendToken);
+        setSending(false);
+    };
+
+    return (
+        <div className="h-full w-full flex flex-col">
+            <div ref={listRef} className="flex-1 overflow-auto space-y-3 pr-2">
+                {messages.map((m, idx) => (
+                    <div
+                        key={idx}
+                        className={`max-w-[80%] rounded-2xl px-4 py-2 custom-font-size custom-line-height ${m.role === "assistant" ? "bg-muted" : "bg-primary text-primary-foreground ml-auto"
+                            }`}
+                    >
+                        {m.content}
+                    </div>
+                ))}
+                {sending && (
+                    <div className="max-w-[80%] rounded-2xl px-4 py-2 bg-muted">Thinking…</div>
+                )}
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+                <input
+                    className="flex-1 rounded-xl border px-3 py-2 bg-background"
+                    placeholder="Ask or reflect about this chapter..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            onSend();
+                        }
+                    }}
+                    disabled={sending}
+                />
+                <Button onClick={onSend} size="icon" aria-label="Send" disabled={sending}>
+                    <Send className="h-4 w-4" />
+                </Button>
+            </div>
+        </div>
+    );
+}
+
+// ------------------------------------------------------
+// Form page renderer
+// ------------------------------------------------------
+function FormPage({ fields, fontSize, answers, setAnswers }: { fields: Field[]; fontSize: number; answers: Record<string, any>; setAnswers: (updater: (prev: Record<string, any>) => Record<string, any>) => void; }) {
+    const labelCls = "block mb-1";
+    const controlClass = `custom-font-size custom-line-height`;
+    
+    // Update text size styles based on the fontSize prop
+    useEffect(() => {
+        // This ensures form fields use the same font size as text content
+        if (typeof document !== 'undefined' && document.documentElement) {
+            document.documentElement.style.setProperty('--reader-font-size', `${fontSize}px`);
+        }
+    }, [fontSize]);
+
+    const setVal = (id: string, val: any) => setAnswers((prev) => ({ ...prev, [id]: val }));
+
+    return (
+        <div className="h-full w-full overflow-auto pr-1 space-y-4">
+            {fields.map((f) => {
+                if (f.type === "text") {
+                    return (
+                        <div key={f.id}>
+                            <label className={labelCls}>{f.label}</label>
+                            {f.multiline ? (
+                                <textarea className={`w-full rounded-xl border p-2 bg-background ${controlClass}`} placeholder={f.placeholder} value={answers[f.id] ?? ""} onChange={(e) => setVal(f.id, e.target.value)} rows={Math.max(3, Math.round(fontSize / 6))} />
+                            ) : (
+                                <input className={`w-full rounded-xl border p-2 bg-background ${controlClass}`} placeholder={f.placeholder} value={answers[f.id] ?? ""} onChange={(e) => setVal(f.id, e.target.value)} />
+                            )}
+                        </div>
+                    );
+                }
+                if (f.type === "number") {
+                    return (
+                        <div key={f.id}>
+                            <label className={labelCls}>{f.label}</label>
+                            <input placeholder={f.placeholder} type="number" className={`w-40 rounded-xl border p-2 bg-background ${controlClass}`} value={answers[f.id] ?? ""} min={(f as NumberField).min} max={(f as NumberField).max} onChange={(e) => setVal(f.id, e.target.valueAsNumber)} />
+                        </div>
+                    );
+                }
+                if (f.type === "select") {
+                    const sf = f as SelectField;
+                    return (
+                        <div key={f.id}>
+                            <label className={labelCls}>{f.label}</label>
+                            <select title={f.label} className={`w-full rounded-xl border p-2 bg-background ${controlClass}`} value={answers[f.id] ?? ""} onChange={(e) => setVal(f.id, e.target.value)}>
+                                <option value="" disabled>Choose…</option>
+                                {sf.options.map((opt) => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                        </div>
+                    );
+                }
+                if (f.type === "checkboxes") {
+                    const cf = f as CheckboxField;
+                    const cur: string[] = Array.isArray(answers[f.id]) ? answers[f.id] : [];
+                    const toggle = (opt: string) => {
+                        const next = cur.includes(opt) ? cur.filter((v) => v !== opt) : [...cur, opt];
+                        setVal(f.id, next);
+                    };
+                    return (
+                        <div key={f.id}>
+                            <label className={labelCls}>{f.label}</label>
+                            <div className="flex flex-col gap-1">
+                                {cf.options.map((opt) => (
+                                    <label key={opt} className="inline-flex items-center gap-2">
+                                        <input type="checkbox" checked={cur.includes(opt)} onChange={() => toggle(opt)} />
+                                        <span className={controlClass}>{opt}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                }
+                return null;
+            })}
+        </div>
+    );
+}
+
+// ------------------------------------------------------
+// Main Component
+// ------------------------------------------------------
+export default function BookReaderApp() {
+    const book = sampleBook;
+    const viewportRef = useRef<HTMLDivElement | null>(null);
+    
+    // Calculate a more sensible default font size based on viewport width
+    const getInitialFontSize = () => {
+        if (typeof window === 'undefined') return 18;
+        return window.innerWidth < 640 ? 16 : 18;
+    };
+
+    const [settings, setSettings] = useState({
+        fontSize: getInitialFontSize(),
+        fontFamily: "serif" as "serif" | "sans" | "mono",
+        theme: "system" as "light" | "dark" | "system",
+    });
+
+    const [chapterIndex, setChapterIndex] = useState(0);
+    const [pageIndex, setPageIndex] = useState(0);
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [pages, setPages] = useState<Page[]>([]);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [chatByChapter, setChatByChapter] = useState<Record<number, ChatMsg[]>>({});
+    const [answersByChapter, setAnswersByChapter] = useState<Record<number, Record<string, any>>>({});
+
+    const currentChapter = book.chapters[chapterIndex] as any;
+
+    const computePagesFor = (content: string, fieldsInput?: Field[] | null): Page[] => {
+        const fields = fieldsInput ?? [];
+        const vp = viewportRef.current;
+        
+        // If viewport ref isn't available yet, create simple pages with actual content
+        if (!vp) {
+            // Break content into paragraphs for a basic display
+            const paragraphs = content.split(/\n\n+/);
+            const lines = paragraphs.length > 0 ? paragraphs : [content || ""];
+            
+            // Even with no viewport ref, we need to create content that can be displayed
+            const textPages = [{ type: "text", lines } as Page];
+            const result: Page[] = [...textPages, { type: "chatbot" }];
+            if (fields.length) result.push({ type: "form", fields });
+            
+            // Log this situation for debugging
+            console.log("Creating initial pages without viewport reference");
+            return result;
+        }
+        
+        // Adjust padding based on viewport size for better mobile experience
+        const padding = window.innerWidth < 640 ? 12 : 24;
+        const width = Math.max(0, vp.clientWidth - padding * 2);
+        const height = Math.max(1, vp.clientHeight - padding * 2);
+        const font = fontSpec(settings.fontFamily, settings.fontSize);
+        const lineHeightPx = settings.fontSize * 1.6;
+
+        // text pages
+        const textPagesLines = layoutLines(content, width, font, lineHeightPx, height);
+        
+        // Check if we got valid results from layoutLines
+        if (!textPagesLines || textPagesLines.length === 0 || 
+            (textPagesLines.length === 1 && textPagesLines[0].length === 0)) {
+            console.warn("Layout lines returned empty result, using fallback content");
+        }
+        
+        // Ensure there's at least one text page, even if empty
+        const textPages = (textPagesLines && textPagesLines.length > 0)
+            ? textPagesLines.map((lines) => ({ type: "text", lines }) as Page)
+            : [{ type: "text", lines: ["[Content is being prepared...]"] } as Page]; // Fallback with message
+            
+        // chatbot single page
+        const chatbot: Page = { type: "chatbot" };
+        // form pages (0..n)
+        const formPages = fields.length ? layoutFormPages(fields, width, font, lineHeightPx, height) : [];
+        return [...textPages, chatbot, ...formPages];
+    };
+
+    const relayout = () => {
+        const fields: Field[] = (currentChapter.form?.fields as Field[] | undefined) ?? [];
+        const newPages = computePagesFor(currentChapter.content ?? "", fields);
+        
+        // Safety check - ensure we always have at least one page
+        if (newPages.length === 0) {
+            // Create a minimal fallback page
+            const fallbackPage: Page = { 
+                type: "text", 
+                lines: ["[Content being prepared...]"] 
+            };
+            setPages([fallbackPage]);
+            console.warn("Layout produced zero pages, using fallback page");
+        } else {
+            setPages(newPages);
+        }
+        
+        // Ensure page index is in valid range for the new pages
+        setPageIndex((p) => clamp(p, 0, Math.max(0, newPages.length - 1)));
+    };
+
+    // Use useLayoutEffect for accurate DOM measurements before paint
+    useLayoutEffect(() => {
+        // Initialize the app with content, even without proper layout measurements
+        if (!isInitialized) {
+            const fields: Field[] = (currentChapter.form?.fields as Field[] | undefined) ?? [];
+            const initialPages = computePagesFor(currentChapter.content ?? "", fields);
+            setPages(initialPages);
+            setPageIndex(0);
+            setIsInitialized(true);
+            
+            // Set the initial CSS variable for font size
+            if (typeof document !== 'undefined' && document.documentElement) {
+                document.documentElement.style.setProperty('--reader-font-size', `${settings.fontSize}px`);
+            }
+        }
+        
+        // Always attempt to relayout with the latest measurements
+        relayout();
+        
+        const onResize = () => {
+            // Just relayout on resize without changing font size or font family
+            relayout();
+        };
+        
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, [chapterIndex, settings.fontSize, settings.fontFamily, isInitialized, currentChapter]);
+
+    useEffect(() => {
+        const root = document.documentElement;
+        const mql = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+        const apply = () => {
+            const preferDark = !!mql && mql.matches;
+            const wantDark = settings.theme === "dark" || (settings.theme === "system" && preferDark);
+            root.classList.toggle("dark", wantDark);
+        };
+        apply();
+        if (mql) {
+            mql.addEventListener?.("change", apply);
+            return () => mql.removeEventListener?.("change", apply);
+        }
+    }, [settings.theme]);
+    
+    // Update the CSS variable for font size whenever settings change
+    useEffect(() => {
+        // Only update if we're in a browser environment
+        if (typeof document !== 'undefined' && document.documentElement) {
+            document.documentElement.style.setProperty('--reader-font-size', `${settings.fontSize}px`);
+        }
+    }, [settings.fontSize]);
+
+    useEffect(() => {
+        if (pages.length > 0) {
+            setPageIndex((p) => clamp(p, 0, Math.max(0, pages.length - 1)));
+        }
+    }, [pages.length]);
+
+    // Sanity checks (light tests)
+    useEffect(() => {
+        // Only run assertions if in development mode
+        if (process.env.NODE_ENV !== 'production') {
+            console.assert(book && book.chapters?.length > 0, "Book should exist with chapters");
+            console.assert(Array.isArray(pages), "Pages should be an array");
+            
+            // Instead of asserting, fix the situation by ensuring we have pages
+            if (viewportRef.current && pages.length === 0) {
+                console.warn("No pages after layout, creating fallback page");
+                // Schedule a relayout to fix the issue
+                setTimeout(() => {
+                    relayout();
+                }, 0);
+            }
+            
+            console.assert(pageIndex >= 0 && (pages.length === 0 || pageIndex < pages.length), "pageIndex in range");
+            
+            pages.forEach((pg, idx) => {
+                if (pg?.type === "form") {
+                    console.assert(Array.isArray((pg as any).fields), `Form page ${idx} must have a fields array`);
+                }
+            });
+        }
+    }, [book, pages, pageIndex]);
+
+    const pageHTML = useMemo(() => {
+        if (!pages.length || pageIndex < 0 || pageIndex >= pages.length) return "";
+        const pg = pages[pageIndex];
+        if (pg?.type !== "text") return "";
+        
+        // Ensure we have valid lines to render
+        const lines = pg.lines || [];
+        if (lines.length === 0) return "<div>\u00A0</div>"; // Non-breaking space if empty
+        
+        return lines.map((line) => `<div>${escapeHtml(line || "\u00A0")}</div>`).join("");
+    }, [pages, pageIndex]);
+
+    // Navigation helpers
+    const atLastPage = pages.length > 0 && pageIndex >= Math.max(0, pages.length - 1);
+    const hasNextChapter = chapterIndex < book.chapters.length - 1;
+    const hasPrevChapter = chapterIndex > 0;
+    const canGoNext = pages.length > 0 && (!atLastPage || hasNextChapter);
+    const canGoPrev = pages.length > 0 && (pageIndex > 0 || hasPrevChapter);
+
+    const computeChapterPages = (idx: number) =>
+        computePagesFor(
+            book.chapters[idx].content ?? "",
+            ((book.chapters[idx] as any).form?.fields as Field[] | undefined) ?? []
+        );
+
+    const goNext = () => {
+        if (!pages.length) return;
+        if (!atLastPage) {
+            setPageIndex((p) => p + 1);
+        } else if (hasNextChapter) {
+            const next = clamp(chapterIndex + 1, 0, book.chapters.length - 1);
+            const nextPages = computeChapterPages(next);
+            setChapterIndex(next);
+            setPages(nextPages);
+            setPageIndex(0);
+        }
+    };
+
+    const goPrev = () => {
+        if (!pages.length) return;
+        if (pageIndex > 0) {
+            setPageIndex((p) => p - 1);
+        } else if (hasPrevChapter) {
+            const prev = clamp(chapterIndex - 1, 0, book.chapters.length - 1);
+            const prevPages = computeChapterPages(prev);
+            setChapterIndex(prev);
+            setPages(prevPages);
+            setPageIndex(Math.max(0, prevPages.length - 1));
+        }
+    };
+
+    const gotoChapter = (i: number) => {
+        const idx = clamp(i, 0, book.chapters.length - 1);
+        const newPages = computeChapterPages(idx);
+        setChapterIndex(idx);
+        setPages(newPages);
+        setPageIndex(0);
+        setSidebarOpen(false);
+    };
+
+    // Per-chapter chat + form state
+    const chatMessages = chatByChapter[chapterIndex] ?? [];
+    // Ensure setChatMessages matches React.Dispatch<React.SetStateAction<ChatMsg[]>>
+    const setChatMessages: React.Dispatch<React.SetStateAction<ChatMsg[]>> = (value) => {
+        try {
+            setChatByChapter((prev) => ({
+                ...prev,
+                [chapterIndex]:
+                    typeof value === "function"
+                        ? (value(prev[chapterIndex] ?? []))
+                        : value,
+            }));
+        } catch (error) {
+            console.error("Error setting chat messages:", error);
+        }
+    };
+    const answers = answersByChapter[chapterIndex] ?? {};
+    const setAnswers = (updater: (prev: Record<string, any>) => Record<string, any>) => {
+        setAnswersByChapter((prev) => ({ ...prev, [chapterIndex]: updater(prev[chapterIndex] ?? {}) }));
+    };
+
+    const currentPage = pages[pageIndex];
+
+    return (
+        <div className="min-h-screen w-full bg-background text-foreground flex flex-col">
+            {/* Sidebar overlay */}
+            {sidebarOpen && (
+                <div className="fixed inset-0 z-40 bg-black/40" onClick={() => setSidebarOpen(false)} aria-hidden />
+            )}
+
+            {/* Sidebar */}
+            <aside
+                className={`fixed left-0 top-0 z-50 h-full w-full sm:w-72 bg-card border-r shadow transition-transform duration-200 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    }`}
+            >
+                <div className="p-3 sm:p-4 border-b font-semibold flex justify-between items-center">
+                    <span>Chapters</span>
+                    <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)} className="sm:hidden">✕</Button>
+                </div>
+                <div className="p-3 space-y-2 overflow-auto h-[calc(100%-3rem)]">
+                    {book.chapters.map((c, i) => (
+                        <Button
+                            key={i}
+                            variant={i === chapterIndex ? "default" : "outline"}
+                            size="sm"
+                            className="w-full justify-start whitespace-normal text-left"
+                            onClick={() => gotoChapter(i)}
+                        >
+                            {i + 1}. {c.title}
+                        </Button>
+                    ))}
+                </div>
+            </aside>
+
+            <div className="mx-auto max-w-4xl px-2 sm:px-4 py-3 sm:py-6 flex-1 flex flex-col min-h-0">
+                <div className="mb-2 sm:mb-4 text-xs sm:text-sm text-muted-foreground flex items-center gap-2 sm:gap-3">
+                    <Button variant="ghost" size="icon" aria-label="Open chapters" onClick={() => setSidebarOpen(true)}>
+                        <Menu className="h-4 sm:h-5 w-4 sm:w-5" />
+                    </Button>
+                    <span className="truncate">{book.title} — {book.author} · {book.year}</span>
+                </div>
+                <Card className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                    <CardHeader className="px-3 sm:px-6 py-2 sm:py-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                            <CardTitle className="text-base sm:text-xl truncate">{(book.chapters[chapterIndex] as any).title}</CardTitle>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm" className="self-end sm:self-auto">Reader settings</Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[560px]">
+                                    <DialogHeader>
+                                        <DialogTitle>Reader preferences</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Font size: {settings.fontSize}px</label>
+                                            <Slider value={[settings.fontSize]} min={12} max={32} step={1} onValueChange={([v]) => setSettings({ ...settings, fontSize: v })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Font family</label>
+                                            <div className="flex gap-2 flex-wrap">
+                                                <Button type="button" variant={settings.fontFamily === 'serif' ? 'default' : 'outline'} size="sm" onClick={() => setSettings({ ...settings, fontFamily: 'serif' })}>Serif</Button>
+                                                <Button type="button" variant={settings.fontFamily === 'sans' ? 'default' : 'outline'} size="sm" onClick={() => setSettings({ ...settings, fontFamily: 'sans' })}>Sans</Button>
+                                                <Button type="button" variant={settings.fontFamily === 'mono' ? 'default' : 'outline'} size="sm" onClick={() => setSettings({ ...settings, fontFamily: 'mono' })}>Mono</Button>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Theme</label>
+                                            <div className="flex gap-2 flex-wrap">
+                                                <Button type="button" variant={settings.theme === 'light' ? 'default' : 'outline'} size="sm" onClick={() => setSettings({ ...settings, theme: 'light' })}>Light</Button>
+                                                <Button type="button" variant={settings.theme === 'dark' ? 'default' : 'outline'} size="sm" onClick={() => setSettings({ ...settings, theme: 'dark' })}>Dark</Button>
+                                                <Button type="button" variant={settings.theme === 'system' ? 'default' : 'outline'} size="sm" onClick={() => setSettings({ ...settings, theme: 'system' })}>System</Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="flex-1 flex flex-col min-h-0 p-2 sm:p-6">
+                        {/* Attach viewportRef to the actual text content container for accurate measurement */}
+                        {!currentPage ? (
+                            <div className="h-full w-full flex items-center justify-center">
+                                <div ref={viewportRef} className="text-muted-foreground">Loading...</div>
+                            </div>
+                        ) : currentPage.type === "text" ? (
+                            <div
+                                ref={viewportRef}
+                                className={`flex-1 min-h-0 border rounded-lg sm:rounded-2xl overflow-auto p-3 sm:p-6 custom-font-size custom-line-height ${settings.fontFamily}-font flex flex-col justify-start`}
+                            >
+                                {/* eslint-disable-next-line react/no-danger */}
+                                <div 
+                                    dangerouslySetInnerHTML={{ __html: pageHTML }} 
+                                    className="w-full"
+                                />
+                            </div>
+                        ) : currentPage.type === "chatbot" ? (
+                            <ChatbotPanel
+                                chapterIdx={chapterIndex}
+                                chapterTitle={(book.chapters[chapterIndex] as any).title}
+                                config={(book.chapters[chapterIndex] as any).chatbot as ChatbotConfig}
+                                messages={chatMessages}
+                                setMessages={setChatMessages}
+                                fontSize={settings.fontSize}
+                            />
+                        ) : (
+                            <FormPage
+                                fields={(currentPage as any)?.fields ?? []}
+                                fontSize={settings.fontSize}
+                                answers={answers}
+                                setAnswers={setAnswers}
+                            />
+                        )}
+
+                        <div className="mt-2 sm:mt-4 flex justify-between items-center gap-2 sm:gap-4 px-2 sm:px-0">
+                            <Button onClick={goPrev} disabled={!canGoPrev} variant="outline" size="sm" className="sm:size-md">
+                                <ChevronLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" /> <span className="sm:inline">Prev</span>
+                            </Button>
+                            <div className="text-xs sm:text-sm text-muted-foreground text-center">
+                                Page {Math.min(pageIndex + 1, Math.max(1, pages.length))} / {Math.max(1, pages.length)}
+                            </div>
+                            <Button onClick={goNext} disabled={!canGoNext} variant="outline" size="sm" className="sm:size-md">
+                                <span className="sm:inline">Next</span> <ChevronRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    );
+}

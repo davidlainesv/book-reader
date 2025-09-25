@@ -1,0 +1,16 @@
+/* BookReaderApp CSS Module */
+
+.readerContent {
+  /* Dynamic styles will be applied via CSS custom properties */
+  font-size: var(--reader-font-size, 18px);
+  line-height: var(--reader-line-height, 1.8);
+}
+
+.columnContainer {
+  column-width: var(--column-width);
+  column-gap: 2px;
+}
+
+.proseArticle {
+  margin: 0;
+}
