@@ -17,7 +17,7 @@ export async function callLLM(systemPrompt: string, convo: ChatMsg[]): Promise<s
     throw new Error("Unexpected response shape");
   } catch (err) {
     const lastUser = [...convo].reverse().find((m) => m.role === "user")?.content ?? "";
-    return lastUser ? `Thanks! On ${lastUser.slice(0, 60)}… what evidence in the text supports that?` : "What part of the chapter felt most important to you?";
+    return lastUser ? `¡Gracias! Sobre ${lastUser.slice(0, 60)}… ¿qué evidencia en el texto respalda eso?` : "¿Qué parte del capítulo te pareció más importante?";
   }
 }
 
@@ -67,11 +67,11 @@ export async function callLLMStream(systemPrompt: string, convo: ChatMsg[], onTo
 // Build the system prompt for the chatbot
 export function buildSystemPrompt(config: ChatbotConfig, chapterTitle: string): string {
   if (config.systemPrompt && config.systemPrompt.trim()) return config.systemPrompt.trim();
-  const persona = config.persona || "You are a friendly literature guide: warm, concise, Socratic.";
-  const instruction = config.instruction || `Discuss ${chapterTitle}. Ask short, open questions and encourage evidence from the text.`;
+  const persona = config.persona || "Eres una guía de literatura amigable: cálida, concisa, socrática.";
+  const instruction = config.instruction || `Discute ${chapterTitle}. Haz preguntas cortas y abiertas y fomenta evidencia del texto.`;
   return [
     persona,
-    `Instructions: ${instruction}`,
-    "Style: concise, upbeat, and curious. Always end with a question to invite the reader to respond.",
+    `Instrucciones: ${instruction}`,
+    "Estilo: conciso, optimista y curioso. Siempre termina con una pregunta para invitar al lector a responder.",
   ].join("\n");
 }

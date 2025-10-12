@@ -25,6 +25,7 @@ export type ChatbotContent = {
 
 export type FormContent = {
   type: "form";
+  title: string;
   fields: Field[];
 };
 

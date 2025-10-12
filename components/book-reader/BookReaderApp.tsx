@@ -10,6 +10,7 @@ import ChatbotPanel from "./ChatbotPanel";
 import FormPage from "./FormPage";
 import { ChatMsg, ChatbotConfig, PageContent } from "@/lib/types/book";
 import styles from "./BookReaderApp.module.css";
+import "./reading-enhancements.css";
 import { sampleBook } from "@/lib/constants/sample-book";
 
 // ======================================================
@@ -33,6 +34,7 @@ export default function BookReaderApp() {
   const [pageIdx, setPageIdx] = useState(0);
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
   const [formAnswers, setFormAnswers] = useState<Record<string, any>>({});
+  const [showBookInfo, setShowBookInfo] = useState(false);
 
   const chapter = book.chapters[chapterIdx];
   const page = chapter.pages[pageIdx];
@@ -156,97 +158,152 @@ export default function BookReaderApp() {
   };
 
   return (
-    <div className="h-screen w-full bg-background text-foreground flex flex-col">
-      <div className="mx-auto max-w-4xl px-4 py-4 flex flex-col h-full w-full min-h-0">
-        <div className="mb-3 text-sm text-muted-foreground flex items-center gap-3 flex-shrink-0">
-          <span>{book.title} — {book.author} · {book.year}</span>
-        </div>
+    <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-slate-800 text-foreground flex flex-col">
+      {/* Modern Header */}
+      <div className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
+        <div className="px-4 h-full flex items-center">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Menu" className="hover:bg-gray-100 dark:hover:bg-gray-800 flex-shrink-0">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold">Índice de Contenidos</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-1 max-h-96 overflow-y-auto">
+                    {book.chapters.map((ch, idx) => (
+                      <DialogClose key={idx} asChild>
+                        <button
+                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${
+                            idx === chapterIdx ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
+                          }`}
+                          onClick={() => {
+                            setChapterIdx(idx);
+                            setPageIdx(0);
+                            setTextColIndex(0);
+                          }}
+                        >
+                          <div className="text-sm font-medium">{ch.title || `Chapter ${idx + 1}`}</div>
+                          <div className="text-xs text-muted-foreground mt-1">{ch.pages.length} pages</div>
+                        </button>
+                      </DialogClose>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <div className="relative flex-1 min-w-0">
+                <div 
+                  className="cursor-pointer group"
+                  onMouseEnter={() => setShowBookInfo(true)}
+                  onMouseLeave={() => setShowBookInfo(false)}
+                  onClick={() => setShowBookInfo(!showBookInfo)}
+                >
+                  <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                    {chapter.title}
+                  </h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-500 truncate">
+                    Capítulo {chapterIdx + 1}
+                  </p>
+                </div>
+                
+                {/* Book Info Notch */}
+                {showBookInfo && (
+                  <div className="absolute top-full left-0 mt-2 p-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg shadow-lg z-50 min-w-64 animate-in fade-in-0 zoom-in-95 duration-200">
+                    <div className="text-sm font-medium">{book.title}</div>
+                    <div className="text-xs opacity-80 mt-1">{book.author} · {book.year}</div>
+                    {/* Notch arrow */}
+                    <div className="absolute -top-1 left-4 w-2 h-2 bg-gray-900 dark:bg-gray-100 rotate-45"></div>
+                  </div>
+                )}
+              </div>
+            </div>
 
-        <Card className="flex-1 flex flex-col min-h-0">
-          <CardHeader className="flex justify-between items-center flex-shrink-0">
             <div className="flex items-center gap-2">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Menu"><Menu className="h-5 w-5" /></Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Configuración de Lectura"
+                    title="Configuración de Lectura"
+                    className="hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <Settings className="h-5 w-5" />
+                  </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[480px]">
                   <DialogHeader>
-                    <DialogTitle>Chapters</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold">Preferencias de Lectura</DialogTitle>
                   </DialogHeader>
-                  <ul className="space-y-2">
-                    {book.chapters.map((ch, idx) => (
-                      <li key={idx}>
-                        <DialogClose asChild>
-                          <button
-                            className="w-full text-left p-2 hover:bg-muted rounded"
-                            onClick={() => {
-                              setChapterIdx(idx);
-                              setPageIdx(0);
-                              setTextColIndex(0);
-                            }}
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tamaño de Fuente</label>
+                      <div className="flex items-center justify-center gap-4">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setSettings({ ...settings, fontSize: Math.max(12, settings.fontSize - 2) })}
+                          disabled={settings.fontSize <= 12}
+                          className="h-12 w-12 text-base hover:bg-gray-50 dark:hover:bg-gray-800"
+                        >
+                          T
+                        </Button>
+                        <span className="text-lg font-medium min-w-[3ch] text-center bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded">
+                          {settings.fontSize}px
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setSettings({ ...settings, fontSize: Math.min(32, settings.fontSize + 2) })}
+                          disabled={settings.fontSize >= 32}
+                          className="h-12 w-12 text-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800"
+                        >
+                          T
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Familia de Fuente</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['serif', 'sans', 'mono'] as const).map((font) => (
+                          <Button
+                            key={font}
+                            variant={settings.fontFamily === font ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setSettings({ ...settings, fontFamily: font })}
+                            className="capitalize font-medium"
                           >
-                            {ch.title || `Chapter ${idx + 1}`}
-                          </button>
-                        </DialogClose>
-                      </li>
-                    ))}
-                  </ul>
-                </DialogContent>
-              </Dialog>
-              <CardTitle>{chapter.title}</CardTitle>
-            </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Configuración de lectura"
-                  title="Configuración de lectura"
-                >
-                  <Settings className="h-5 w-5" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[560px]">
-                <DialogHeader><DialogTitle>Preferencias de lectura</DialogTitle></DialogHeader>
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium">Tamaño de fuente</label>
-                    <div className="flex items-center justify-center gap-4">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setSettings({ ...settings, fontSize: Math.max(12, settings.fontSize - 2) })}
-                        disabled={settings.fontSize <= 12}
-                        className="h-12 w-12 text-base"
-                      >
-                        T
-                      </Button>
-                      <span className="text-lg font-medium min-w-[3ch] text-center">
-                        {settings.fontSize}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setSettings({ ...settings, fontSize: Math.min(32, settings.fontSize + 2) })}
-                        disabled={settings.fontSize >= 32}
-                        className="h-12 w-12 text-xl font-bold"
-                      >
-                        T
-                      </Button>
+                            {font === 'serif' ? 'Aa' : font === 'sans' ? 'Aa' : 'Aa'}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  {/* <div className="space-y-2">
-                    <label className="text-sm font-medium">Line height: {settings.lineHeight.toFixed(1)}</label>
-                    <Slider value={[settings.lineHeight]} min={1.4} max={2.2} step={0.1} onValueChange={([v]) => setSettings({ ...settings, lineHeight: v })} />
-                  </div> */}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardHeader>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <CardContent className="flex-1 flex flex-col min-h-0">
+      {/* Main Content Area */}
+      <div className="flex-1 mx-auto max-w-5xl flex flex-col h-full w-full min-h-0 fade-in">
+        <div className="flex-1 bg-white dark:bg-gray-900 book-shadow border border-gray-200/50 dark:border-gray-700/50 flex flex-col min-h-0 overflow-hidden page-transition">
+          {/* Reading Content */}
+          <div className="flex-1 flex flex-col min-h-0">
             <div
-              className={`relative flex-1 overflow-hidden rounded-2xl border p-6 ${styles.readerContent}`}
+              className={`relative flex-1 overflow-hidden reading-text custom-scrollbar ${styles.readerContent} ${
+                settings.fontFamily === 'serif' ? 'font-serif' : 
+                settings.fontFamily === 'sans' ? 'font-sans' : 'font-mono'
+              } ${
+                page?.type === 'text' ? 'p-8' : ''
+              }`}
               style={{
                 '--reader-font-size': `${settings.fontSize}px`,
                 '--reader-line-height': settings.lineHeight
@@ -261,7 +318,7 @@ export default function BookReaderApp() {
                   } as React.CSSProperties}
                 >
                   <article
-                    className={`prose dark:prose-invert max-w-none ${styles.proseArticle}`}
+                    className={`prose prose-lg dark:prose-invert max-w-none ${styles.proseArticle}`}
                     dangerouslySetInnerHTML={{ __html: page.content }}
                   />
                 </div>
@@ -280,6 +337,7 @@ export default function BookReaderApp() {
 
               {page?.type === "form" && (
                 <FormPage
+                  title={page.title || ""}
                   fields={page.fields}
                   fontSize={settings.fontSize}
                   answers={formAnswers}
@@ -288,45 +346,91 @@ export default function BookReaderApp() {
               )}
 
               {page?.type === "audio" && (
-                <div className="h-full w-full flex flex-col">
-                  <div className="p-6 border-b flex-shrink-0">
+                <div className="h-full w-full flex flex-col bg-gradient-to-b from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg">
+                  {/* Audio Header */}
+                  <div className="px-6 py-4 border-b border-purple-200/50 dark:border-purple-800/50 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-t-lg">
+                    <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-3">🎵 Audio Content</h3>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-purple-200/50 dark:border-purple-700/50 shadow-sm">
                     <audio controls src={page.url} className="w-full">
-                      Your browser does not support the audio element.
+                        Tu navegador no soporta el elemento de audio.
                     </audio>
+                    </div>
                   </div>
-                  <div
-                    className="prose dark:prose-invert max-w-none p-6 overflow-y-auto"
-                    dangerouslySetInnerHTML={{ __html: page.htmlContent }}
-                  />
+                  {/* Audio Transcript/Content */}
+                  <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    <div
+                      className="prose prose-lg dark:prose-invert max-w-none p-6 reading-text"
+                      dangerouslySetInnerHTML={{ __html: page.htmlContent }}
+                    />
+                  </div>
                 </div>
               )}
-
             </div>
+          </div>
 
-            <div className="mt-4 text-sm text-muted-foreground flex justify-between items-center flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <Button size="sm" onClick={goPrev} variant="secondary" disabled={chapterIdx === 0 && pageIdx === 0 && textColIndex === 0}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <div>Page {pageIdx + 1} / {chapter.pages.length}</div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div>
-                  {page?.type === 'text' ? (
-                    <>Column {Math.min(textColIndex + 1, textColCount)} / {textColCount}</>
-                  ) : page?.type === 'chatbot' ? (
-                    <>Chatbot</>
-                  ) : page?.type === 'form' ? (
-                    <>Form</>
-                  ) : null}
+          {/* Chapter Progress Bar */}
+          <div className="px-8 py-2 border-t border-gray-200/50 dark:border-gray-700/50">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-green-500 to-emerald-500 progress-bar rounded-full transition-all duration-500"
+                style={{ 
+                  width: `${((pageIdx * (page?.type === 'text' && textColCount > 1 ? textColCount : 1) + 
+                    (page?.type === 'text' ? Math.min(textColIndex + 1, textColCount) : 1)) / 
+                    (chapter.pages.reduce((acc, p, idx) => {
+                      // Calculate total "sections" in chapter - for text pages use textColCount, for others use 1
+                      if (p.type === 'text') {
+                        // For text pages, we need to estimate column count (use current textColCount as approximation)
+                        return acc + (textColCount > 1 ? textColCount : 1);
+                      }
+                      return acc + 1;
+                    }, 0))) * 100}%` 
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Navigation Controls */}
+          <div className="px-8 py-4 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30">
+            <div className="flex items-center justify-between">
+              <Button 
+                size="sm" 
+                onClick={goPrev} 
+                variant="outline" 
+                disabled={chapterIdx === 0 && pageIdx === 0 && textColIndex === 0}
+                className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 interactive-element enhanced-focus transition-all duration-200"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Anterior
+              </Button>
+              
+              <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-center bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-full">
+                  {/* <div className="font-medium text-gray-900 dark:text-gray-100">
+                    {page?.type === 'text' ? '📖 Lectura' : 
+                     page?.type === 'chatbot' ? '💬 Discusión' : 
+                     page?.type === 'form' ? '✍️ Actividad' : '📄 Contenido'}
+                  </div> */}
+                  <div className="text-xs mt-1">
+                    {page?.type === 'text' && textColCount > 1 ? 
+                      `Sección ${Math.min(textColIndex + 1, textColCount)} de ${textColCount}` : 
+                      `Página ${pageIdx + 1} de ${chapter.pages.length}`
+                    }
+                  </div>
                 </div>
-                <Button size="sm" onClick={goNext} variant="secondary">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
               </div>
+              
+              <Button 
+                size="sm" 
+                onClick={goNext} 
+                variant="outline"
+                className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 interactive-element enhanced-focus transition-all duration-200"
+              >
+                Siguiente
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

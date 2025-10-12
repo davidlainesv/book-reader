@@ -1,12 +1,23 @@
 /* Font family classes for BookReaderApp */
 .serif-font {
-  font-family: serif;
+  font-family: "Crimson Text", "Georgia", "Times New Roman", "Book Antiqua", "Palatino", serif;
 }
 .sans-font {
-  font-family: sans-serif;
+  font-family: "Inter", "SF Pro Text", "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
 }
 .mono-font {
-  font-family: monospace;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Consolas", monospace;
+}
+
+/* Reading-optimized font stack */
+.font-serif {
+  font-family: "Crimson Text", "Georgia", "Times New Roman", "Book Antiqua", "Palatino", serif;
+}
+.font-sans {
+  font-family: "Inter", "SF Pro Text", "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+}
+.font-mono {
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Consolas", monospace;
 }
 
 /* Hide scrollbars */

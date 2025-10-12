@@ -4,13 +4,110 @@
   /* Dynamic styles will be applied via CSS custom properties */
   font-size: var(--reader-font-size, 18px);
   line-height: var(--reader-line-height, 1.8);
+  color: rgb(31 41 55); /* text-gray-800 */
+  
+  /* Enhanced typography for reading */
+  font-variant-ligatures: common-ligatures contextual;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1, "onum" 1, "pnum" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.readerContent.dark {
+  color: rgb(229 231 235); /* text-gray-200 */
 }
 
 .columnContainer {
   column-width: var(--column-width);
   column-gap: 2px;
+  column-rule: 1px solid rgb(229 231 235 / 0.3);
 }
 
 .proseArticle {
   margin: 0;
+  max-width: none;
+  text-align: justify;
+  hyphens: auto;
+  word-spacing: 0.05em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.proseArticle h1,
+.proseArticle h2,
+.proseArticle h3,
+.proseArticle h4,
+.proseArticle h5,
+.proseArticle h6 {
+  break-after: avoid;
+  margin: 1.5em 0 0.75em 0;
+  font-weight: 600;
+  color: rgb(17 24 39); /* text-gray-900 */
+}
+
+.proseArticle.dark h1,
+.proseArticle.dark h2,
+.proseArticle.dark h3,
+.proseArticle.dark h4,
+.proseArticle.dark h5,
+.proseArticle.dark h6 {
+  color: rgb(243 244 246); /* text-gray-100 */
+}
+
+.proseArticle p {
+  margin: 0 0 1.25em 0;
+  break-inside: avoid-column;
+  orphans: 2;
+  widows: 2;
+}
+
+.proseArticle blockquote {
+  border-left: 4px solid rgb(99 102 241); /* border-indigo-500 */
+  padding-left: 1em;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: rgb(75 85 99); /* text-gray-600 */
+  break-inside: avoid;
+}
+
+.proseArticle.dark blockquote {
+  border-left-color: rgb(129 140 248); /* border-indigo-400 */
+  color: rgb(156 163 175); /* text-gray-400 */
+}
+
+/* Reading experience enhancements */
+.proseArticle em {
+  font-style: italic;
+  color: rgb(55 65 81); /* text-gray-700 */
+}
+
+.proseArticle.dark em {
+  color: rgb(209 213 219); /* text-gray-300 */
+}
+
+.proseArticle strong {
+  font-weight: 600;
+  color: rgb(17 24 39); /* text-gray-900 */
+}
+
+.proseArticle.dark strong {
+  color: rgb(243 244 246); /* text-gray-100 */
+}
+
+/* Drop cap for first paragraph (optional reading enhancement) */
+.proseArticle p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.5em;
+  line-height: 0.8;
+  padding-right: 0.1em;
+  margin-top: 0.1em;
+  font-weight: 500;
+  color: rgb(99 102 241); /* text-indigo-500 */
+}
+
+.proseArticle.dark p:first-of-type::first-letter {
+  color: rgb(129 140 248); /* text-indigo-400 */
 }
