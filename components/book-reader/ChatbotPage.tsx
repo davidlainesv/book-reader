@@ -16,7 +16,7 @@ interface ChatbotPageProps {
 }
 
 export default function ChatbotPage({
-  chapterIdx,
+  chapterIdx: _chapterIdx,
   chapterTitle,
   config,
   messages,

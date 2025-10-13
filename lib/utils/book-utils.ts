@@ -1,4 +1,4 @@
-import { Book, Chapter, PageContent, DisplayPage, Field } from "@/lib/types/book";
+import { Book, Chapter, PageContent, DisplayPage } from "@/lib/types/book";
 
 /**
  * Converts a PageContent item to a DisplayPage item that can be rendered in the UI
@@ -19,6 +19,9 @@ export function convertToDisplayPage(pageContent: PageContent): DisplayPage {
     
     case "form":
       return { type: "form", fields: pageContent.fields };
+    
+    case "audio":
+      return { type: "audio", url: pageContent.url, htmlContent: pageContent.htmlContent };
   }
 }
 

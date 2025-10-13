@@ -1,4 +1,4 @@
-import { Book, ChatbotConfig, Field, PageContent } from "@/lib/types/book";
+import { Book, PageContent } from "@/lib/types/book";
 
 // Sample book with per-chapter chatbot + form (5 questions)
 export const sampleBook: Book = {

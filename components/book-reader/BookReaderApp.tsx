@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Menu, Send, Minus, Plus, Settings } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Menu, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Slider } from "@/components/ui/slider";
 import ChatbotPage from "./ChatbotPage";
 import FormPage from "./FormPage";
 import AudioPage from "./AudioPage";
@@ -20,6 +18,7 @@ import { sampleBook } from "@/lib/constants/sample-book";
 export default function BookReaderApp() {
   const book = sampleBook;
   const colRef = useRef<HTMLDivElement | null>(null); // horizontal scroll container for columns
+  const chapterTitleRef = useRef<HTMLDivElement | null>(null); // ref for chapter title positioning
   const [colWidthPx, setColWidthPx] = useState<number>(0);
   const [textColIndex, setTextColIndex] = useState(0);
   const [textColCount, setTextColCount] = useState(1);
@@ -34,7 +33,7 @@ export default function BookReaderApp() {
   const [chapterIdx, setChapterIdx] = useState(0);
   const [pageIdx, setPageIdx] = useState(0);
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
-  const [formAnswers, setFormAnswers] = useState<Record<string, any>>({});
+  const [formAnswers, setFormAnswers] = useState<Record<string, string | number | string[]>>({});
   const [showBookInfo, setShowBookInfo] = useState(false);
 
   const chapter = book.chapters[chapterIdx];
@@ -55,7 +54,7 @@ export default function BookReaderApp() {
   }, [textColIndex, textColCount, page]);
 
   // Recompute column width and count when layout-affecting deps change
-  const recomputeCols = () => {
+  const recomputeCols = useCallback(() => {
     const el = colRef.current; if (!el) return;
     const width = el.clientWidth; // each column should be exactly this width
     setColWidthPx(width);
@@ -85,10 +84,10 @@ export default function BookReaderApp() {
         }
       }
     });
-  };
+  }, [shouldGoToLastColumn]);
 
-  useEffect(() => { recomputeCols(); }, [pageIdx, chapterIdx, settings.fontSize, settings.lineHeight, settings.fontFamily]);
-  useEffect(() => { const onResize = () => recomputeCols(); window.addEventListener('resize', onResize); return () => window.removeEventListener('resize', onResize); }, []);
+  useEffect(() => { recomputeCols(); }, [pageIdx, chapterIdx, settings.fontSize, settings.lineHeight, settings.fontFamily, recomputeCols]);
+  useEffect(() => { const onResize = () => recomputeCols(); window.addEventListener('resize', onResize); return () => window.removeEventListener('resize', onResize); }, [recomputeCols]);
 
   // Keep scroll in sync with the current column index
   useEffect(() => {
@@ -179,9 +178,8 @@ export default function BookReaderApp() {
                     {book.chapters.map((ch, idx) => (
                       <DialogClose key={idx} asChild>
                         <button
-                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${
-                            idx === chapterIdx ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
-                          }`}
+                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${idx === chapterIdx ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
+                            }`}
                           onClick={() => {
                             setChapterIdx(idx);
                             setPageIdx(0);
@@ -196,9 +194,10 @@ export default function BookReaderApp() {
                   </div>
                 </DialogContent>
               </Dialog>
-              
+
               <div className="relative flex-1 min-w-0">
-                <div 
+                <div
+                  ref={chapterTitleRef}
                   className="cursor-pointer group"
                   onMouseEnter={() => setShowBookInfo(true)}
                   onMouseLeave={() => setShowBookInfo(false)}
@@ -211,16 +210,6 @@ export default function BookReaderApp() {
                     Capítulo {chapterIdx + 1}
                   </p>
                 </div>
-                
-                {/* Book Info Notch */}
-                {showBookInfo && (
-                  <div className="absolute top-full left-0 mt-2 p-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg shadow-lg z-50 min-w-64 animate-in fade-in-0 zoom-in-95 duration-200">
-                    <div className="text-sm font-medium">{book.title}</div>
-                    <div className="text-xs opacity-80 mt-1">{book.author} · {book.year}</div>
-                    {/* Notch arrow */}
-                    <div className="absolute -top-1 left-4 w-2 h-2 bg-gray-900 dark:bg-gray-100 rotate-45"></div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -299,12 +288,10 @@ export default function BookReaderApp() {
           {/* Reading Content */}
           <div className="flex-1 flex flex-col min-h-0">
             <div
-              className={`relative flex-1 overflow-hidden reading-text custom-scrollbar ${styles.readerContent} ${
-                settings.fontFamily === 'serif' ? 'font-serif' : 
-                settings.fontFamily === 'sans' ? 'font-sans' : 'font-mono'
-              } ${
-                page?.type === 'text' ? 'p-8' : ''
-              }`}
+              className={`relative flex-1 overflow-hidden reading-text custom-scrollbar ${styles.readerContent} ${settings.fontFamily === 'serif' ? 'font-serif' :
+                  settings.fontFamily === 'sans' ? 'font-sans' : 'font-mono'
+                } ${page?.type === 'text' ? 'p-8' : ''
+                }`}
               style={{
                 '--reader-font-size': `${settings.fontSize}px`,
                 '--reader-line-height': settings.lineHeight
@@ -359,11 +346,11 @@ export default function BookReaderApp() {
           {/* Chapter Progress Bar */}
           <div className="px-8 py-2 border-t border-gray-200/50 dark:border-gray-700/50">
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-green-500 to-emerald-500 progress-bar rounded-full transition-all duration-500"
-                style={{ 
-                  width: `${((pageIdx * (page?.type === 'text' && textColCount > 1 ? textColCount : 1) + 
-                    (page?.type === 'text' ? Math.min(textColIndex + 1, textColCount) : 1)) / 
+                style={{
+                  width: `${((pageIdx * (page?.type === 'text' && textColCount > 1 ? textColCount : 1) +
+                    (page?.type === 'text' ? Math.min(textColIndex + 1, textColCount) : 1)) /
                     (chapter.pages.reduce((acc, p, idx) => {
                       // Calculate total "sections" in chapter - for text pages use textColCount, for others use 1
                       if (p.type === 'text') {
@@ -371,7 +358,7 @@ export default function BookReaderApp() {
                         return acc + (textColCount > 1 ? textColCount : 1);
                       }
                       return acc + 1;
-                    }, 0))) * 100}%` 
+                    }, 0))) * 100}%`
                 }}
               />
             </div>
@@ -380,17 +367,17 @@ export default function BookReaderApp() {
           {/* Navigation Controls */}
           <div className="px-8 py-4 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30">
             <div className="flex items-center justify-between">
-              <Button 
-                size="sm" 
-                onClick={goPrev} 
-                variant="outline" 
+              <Button
+                size="sm"
+                onClick={goPrev}
+                variant="outline"
                 disabled={chapterIdx === 0 && pageIdx === 0 && textColIndex === 0}
                 className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 interactive-element enhanced-focus transition-all duration-200"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Anterior
               </Button>
-              
+
               <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
                 <div className="text-center bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-full">
                   {/* <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -407,10 +394,10 @@ export default function BookReaderApp() {
                   </div>
                 </div>
               </div>
-              
-              <Button 
-                size="sm" 
-                onClick={goNext} 
+
+              <Button
+                size="sm"
+                onClick={goNext}
                 variant="outline"
                 className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 interactive-element enhanced-focus transition-all duration-200"
               >
@@ -421,6 +408,34 @@ export default function BookReaderApp() {
           </div>
         </div>
       </div>
+
+      {/* Book Info Notch - Portal positioned at document level */}
+      {showBookInfo && chapterTitleRef.current && typeof document !== 'undefined' && (
+        (() => {
+          const titleRect = chapterTitleRef.current.getBoundingClientRect();
+          return (
+            <div
+              className="fixed p-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg shadow-lg min-w-64 animate-in fade-in-0 zoom-in-95 duration-200"
+              style={{
+                top: titleRect.bottom + 8,
+                left: titleRect.left,
+                zIndex: 9999
+              }}
+            >
+              <div className="text-sm font-medium">{book.title}</div>
+              <div className="text-xs opacity-80 mt-1">{book.author} · {book.year}</div>
+              {/* Notch arrow */}
+              <div
+                className="absolute w-2 h-2 bg-gray-900 dark:bg-gray-100 rotate-45"
+                style={{
+                  top: -4,
+                  left: 16
+                }}
+              />
+            </div>
+          );
+        })()
+      )}
     </div>
   );
 }

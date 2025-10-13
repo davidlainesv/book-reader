@@ -15,7 +15,7 @@ export async function callLLM(systemPrompt: string, convo: ChatMsg[]): Promise<s
     const text = data.reply || data.message || data.text;
     if (typeof text === "string" && text.trim()) return text.trim();
     throw new Error("Unexpected response shape");
-  } catch (err) {
+  } catch (_err) {
     const lastUser = [...convo].reverse().find((m) => m.role === "user")?.content ?? "";
     return lastUser ? `¡Gracias! Sobre ${lastUser.slice(0, 60)}… ¿qué evidencia en el texto respalda eso?` : "¿Qué parte del capítulo te pareció más importante?";
   }

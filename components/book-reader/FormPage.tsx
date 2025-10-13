@@ -7,8 +7,8 @@ interface FormPageProps {
   title: string;
   fields: Field[];
   fontSize: number;
-  answers: Record<string, any>;
-  setAnswers: (updater: (prev: Record<string, any>) => Record<string, any>) => void;
+  answers: Record<string, string | number | string[]>;
+  setAnswers: (updater: (prev: Record<string, string | number | string[]>) => Record<string, string | number | string[]>) => void;
   onSubmit?: () => void;
 }
 
@@ -24,7 +24,7 @@ export default function FormPage({ title, fields, fontSize, answers, setAnswers,
     }
   }, [fontSize]);
 
-  const setVal = (id: string, val: any) => setAnswers((prev) => ({ ...prev, [id]: val }));
+  const setVal = (id: string, val: string | number | string[]) => setAnswers((prev) => ({ ...prev, [id]: val }));
 
   return (
     <div className="h-full w-full overflow-y-auto bg-gradient-to-b from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg font-sans">
@@ -117,7 +117,7 @@ export default function FormPage({ title, fields, fontSize, answers, setAnswers,
           }
           if (f.type === "checkboxes") {
             const cf = f as CheckboxField;
-            const cur: string[] = Array.isArray(answers[f.id]) ? answers[f.id] : [];
+            const cur: string[] = Array.isArray(answers[f.id]) ? answers[f.id] as string[] : [];
             const toggle = (opt: string) => {
               const next = cur.includes(opt) ? cur.filter((v) => v !== opt) : [...cur, opt];
               setVal(f.id, next);

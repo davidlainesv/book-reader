@@ -26,6 +26,7 @@ export async function POST(req: Request) {
           controller.enqueue(encoder.encode(`data: ${token}\n`));
         }
       } catch (e) {
+        console.error('Stream error:', e);
         controller.enqueue(encoder.encode(`data: [stream-error]\n`));
       } finally {
         controller.close();
