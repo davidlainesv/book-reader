@@ -220,7 +220,7 @@ export default function BookReaderApp() {
   };
 
   return (
-    <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-slate-800 text-foreground flex flex-col">
+    <div className="w-full bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-slate-800 text-foreground flex flex-col" style={{ height: '100dvh' }}>
       {/* Modern Header - Hidden on book cover and index */}
       {!showBookCover && !showIndex && (
         <div className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
@@ -471,27 +471,27 @@ export default function BookReaderApp() {
                     // Main book cover with animated SVG background
                     <div className="h-full w-full relative overflow-hidden">
                       <BookCoverBackground />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/10 dark:bg-black/30 backdrop-blur-[1px]">
-                        <div className="text-center px-8 max-w-4xl z-10">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/10 dark:bg-black/30 backdrop-blur-[1px] overflow-y-auto">
+                        <div className="text-center px-4 sm:px-8 py-20 sm:py-8 max-w-4xl z-10 w-full min-h-full flex flex-col justify-center">
                           <h1 
-                            className="font-bold text-white drop-shadow-2xl leading-tight mb-6"
+                            className="font-bold text-white drop-shadow-2xl leading-tight mb-4 sm:mb-6"
                             style={{
-                              fontSize: `${Math.min(Math.max(settings.fontSize * 3, 40), 64)}px`,
-                              lineHeight: settings.lineHeight,
+                              fontSize: `clamp(36px, 9vw, 72px)`,
+                              lineHeight: 1.2,
                               textShadow: '0 4px 20px rgba(0,0,0,0.5), 0 2px 10px rgba(0,0,0,0.3)'
                             }}
                           >
                             {page.title}
                           </h1>
-                          <div className="flex items-center justify-center gap-4 mt-8">
-                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-white to-transparent opacity-70 rounded-full"></div>
+                          <div className="flex items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-8">
+                            <div className="h-1 w-12 sm:w-16 bg-gradient-to-r from-transparent via-white to-transparent opacity-70 rounded-full"></div>
                             <div className="h-2 w-2 bg-white rounded-full opacity-70"></div>
-                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-white to-transparent opacity-70 rounded-full"></div>
+                            <div className="h-1 w-12 sm:w-16 bg-gradient-to-r from-transparent via-white to-transparent opacity-70 rounded-full"></div>
                           </div>
-                          <div className="mt-8 text-white/90 text-lg font-medium drop-shadow-lg">
+                          <div className="mt-4 sm:mt-8 text-white/90 text-base sm:text-lg font-medium drop-shadow-lg">
                             {book.author}
                           </div>
-                          <div className="mt-2 text-white/80 text-base drop-shadow-lg">
+                          <div className="mt-2 text-white/80 text-sm sm:text-base drop-shadow-lg">
                             {book.year}
                           </div>
                         </div>
@@ -613,13 +613,13 @@ export default function BookReaderApp() {
           {/* Navigation Controls */}
           {showBookCover ? (
             // Animated arrow button for book cover at bottom right
-            <div className="fixed bottom-8 right-8 z-50">
+            <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50">
               <Button
                 size="lg"
                 onClick={goNext}
-                className="h-16 w-16 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 shadow-2xl flex items-center justify-center animate-pulse hover:animate-none transition-all duration-300 hover:scale-110"
+                className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 shadow-2xl flex items-center justify-center animate-pulse hover:animate-none transition-all duration-300 hover:scale-110"
               >
-                <ChevronRight className="h-8 w-8" />
+                <ChevronRight className="h-7 w-7 sm:h-8 sm:w-8" />
               </Button>
             </div>
           ) : (
