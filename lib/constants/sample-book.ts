@@ -6,10 +6,23 @@ export const sampleBook: Book = {
   title: "UJAT 2025: Transformando vidas y sociedad a través de la ciencia",
   author: "Dr. José Ramón Laines Canepa",
   year: 2025,
+  cover: {
+    type: "cover",
+    title: "UJAT 2025: Transformando vidas y sociedad a través de la ciencia",
+    isBookCover: true
+  },
+  index: {
+    type: "index",
+    title: "Índice"
+  },
   chapters: [
     {
       title: "Invitado: Lic. Guillermo Narváez Osorio, Rector de la UJAT",
       pages: [
+        {
+          type: "cover",
+          title: "Invitado: Lic. Guillermo Narváez Osorio, Rector de la UJAT"
+        } as PageContent,
         {
           "type": "text",
           "content": `<h1><strong>Introducción del Capítulo</strong></h1>
@@ -631,8 +644,12 @@ Analiza los casos presentados por el rector de la UJAT y compáralos con experie
       title: "Mujeres en la Ciencia",
       pages: [
         {
+          type: "cover",
+          title: "Mujeres en la Ciencia"
+        } as PageContent,
+        {
           type: "text",
-          content: `El programa “Mujeres en la Ciencia” de la UJAT fomenta la participación femenina en áreas STEM. Este capítulo narra historias de éxito y los retos que enfrentan las mujeres científicas en la universidad.`
+          content: `El programa "Mujeres en la Ciencia" de la UJAT fomenta la participación femenina en áreas STEM. Este capítulo narra historias de éxito y los retos que enfrentan las mujeres científicas en la universidad.`
         } as PageContent,
         {
           type: "chatbot",

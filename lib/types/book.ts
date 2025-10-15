@@ -35,7 +35,18 @@ export type AudioContent = {
   htmlContent: string;
 };
 
-export type PageContent = TextContent | ChatbotContent | FormContent | AudioContent;
+export type CoverContent = {
+  type: "cover";
+  title: string;
+  isBookCover?: boolean; // true for main book cover, false/undefined for chapter covers
+};
+
+export type IndexContent = {
+  type: "index";
+  title: string;
+};
+
+export type PageContent = TextContent | ChatbotContent | FormContent | AudioContent | CoverContent | IndexContent;
 
 // Book structure
 export interface Chapter {
@@ -52,6 +63,8 @@ export interface Book {
   title: string;
   author: string;
   year: number;
+  cover?: CoverContent; // Optional book cover
+  index?: IndexContent; // Optional index page
   chapters: Chapter[];
 }
 
@@ -60,7 +73,9 @@ export type DisplayPage =
   | { type: "text"; lines: string[] }
   | { type: "chatbot" }
   | { type: "form"; fields: Field[] }
-  | { type: "audio"; url: string; htmlContent: string };
+  | { type: "audio"; url: string; htmlContent: string }
+  | { type: "cover"; title: string; isBookCover?: boolean }
+  | { type: "index"; title: string };
 
 // Settings type
 export interface ReaderSettings {

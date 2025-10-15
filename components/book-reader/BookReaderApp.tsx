@@ -7,6 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTr
 import ChatbotPage from "./ChatbotPage";
 import FormPage from "./FormPage";
 import AudioPage from "./AudioPage";
+import { BookCoverBackground } from "./BookCoverBackground";
 import { ChatMsg, ChatbotConfig, PageContent } from "@/lib/types/book";
 import styles from "./BookReaderApp.module.css";
 import "./reading-enhancements.css";
@@ -32,12 +33,14 @@ export default function BookReaderApp() {
 
   const [chapterIdx, setChapterIdx] = useState(0);
   const [pageIdx, setPageIdx] = useState(0);
+  const [showBookCover, setShowBookCover] = useState(book.cover ? true : false); // Show book cover initially if it exists
+  const [showIndex, setShowIndex] = useState(false); // Show index after book cover
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
   const [formAnswers, setFormAnswers] = useState<Record<string, string | number | string[]>>({});
   const [showBookInfo, setShowBookInfo] = useState(false);
 
   const chapter = book.chapters[chapterIdx];
-  const page = chapter.pages[pageIdx];
+  const page = showBookCover ? book.cover : showIndex ? book.index : chapter.pages[pageIdx];
 
   // --- Tests (lightweight) ---
   useEffect(() => {
@@ -112,6 +115,30 @@ export default function BookReaderApp() {
 
   // Navigation
   const goNext = () => {
+    // If showing book cover, go to index (if exists) or first chapter
+    if (showBookCover) {
+      setShowBookCover(false);
+      if (book.index) {
+        setShowIndex(true);
+      } else {
+        setChapterIdx(0);
+        setPageIdx(0);
+      }
+      setTextColIndex(0);
+      setShouldGoToLastColumn(false);
+      return;
+    }
+
+    // If showing index, go to first chapter
+    if (showIndex) {
+      setShowIndex(false);
+      setChapterIdx(0);
+      setPageIdx(0);
+      setTextColIndex(0);
+      setShouldGoToLastColumn(false);
+      return;
+    }
+
     if (page?.type === 'text') {
       // if textColIndex = 1 and textColCount = 3, go to 2
       // if textColIndex = 2 and textColCount = 3, go to next page
@@ -128,11 +155,40 @@ export default function BookReaderApp() {
     else if (chapterIdx < book.chapters.length - 1) {
       setChapterIdx(chapterIdx + 1);
       setPageIdx(0);
+      setTextColIndex(0);
       setShouldGoToLastColumn(false);
     }
   };
 
   const goPrev = () => {
+    // If on index, go back to book cover
+    if (showIndex && book.cover) {
+      setShowIndex(false);
+      setShowBookCover(true);
+      return;
+    }
+
+    // If showing index and no book cover, can't go back
+    if (showIndex) {
+      return;
+    }
+
+    // If on first chapter first page, go back to index or book cover
+    if (!showBookCover && chapterIdx === 0 && pageIdx === 0 && textColIndex === 0) {
+      if (book.index) {
+        setShowIndex(true);
+        return;
+      } else if (book.cover) {
+        setShowBookCover(true);
+        return;
+      }
+    }
+
+    // If showing book cover, can't go back further
+    if (showBookCover) {
+      return;
+    }
+
     if (page?.type === 'text') {
       if (textColIndex > 0) { setTextColIndex(textColIndex - 1); return; }
     }
@@ -142,6 +198,9 @@ export default function BookReaderApp() {
       setPageIdx(prevPageIdx);
       if (prevPage?.type === 'text') {
         setShouldGoToLastColumn(true);
+      } else {
+        setTextColIndex(0);
+        setShouldGoToLastColumn(false);
       }
     }
     else if (chapterIdx > 0) {
@@ -153,14 +212,18 @@ export default function BookReaderApp() {
       setPageIdx(lastPageIdx);
       if (lastPage?.type === 'text') {
         setShouldGoToLastColumn(true);
+      } else {
+        setTextColIndex(0);
+        setShouldGoToLastColumn(false);
       }
     }
   };
 
   return (
     <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-slate-800 text-foreground flex flex-col">
-      {/* Modern Header */}
-      <div className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
+      {/* Modern Header - Hidden on book cover and index */}
+      {!showBookCover && !showIndex && (
+        <div className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
         <div className="px-4 h-full flex items-center">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -175,12 +238,50 @@ export default function BookReaderApp() {
                     <DialogTitle className="text-xl font-semibold">Índice de Contenidos</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-1 max-h-96 overflow-y-auto">
+                    {book.cover && (
+                      <DialogClose asChild>
+                        <button
+                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${showBookCover ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
+                            }`}
+                          onClick={() => {
+                            setShowBookCover(true);
+                            setShowIndex(false);
+                            setChapterIdx(0);
+                            setPageIdx(0);
+                            setTextColIndex(0);
+                          }}
+                        >
+                          <div className="text-sm font-medium">📚 {book.title}</div>
+                          <div className="text-xs text-muted-foreground mt-1">Portada del libro</div>
+                        </button>
+                      </DialogClose>
+                    )}
+                    {book.index && (
+                      <DialogClose asChild>
+                        <button
+                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${showIndex ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
+                            }`}
+                          onClick={() => {
+                            setShowBookCover(false);
+                            setShowIndex(true);
+                            setChapterIdx(0);
+                            setPageIdx(0);
+                            setTextColIndex(0);
+                          }}
+                        >
+                          <div className="text-sm font-medium">📑 Índice</div>
+                          <div className="text-xs text-muted-foreground mt-1">Tabla de contenidos</div>
+                        </button>
+                      </DialogClose>
+                    )}
                     {book.chapters.map((ch, idx) => (
                       <DialogClose key={idx} asChild>
                         <button
-                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${idx === chapterIdx ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
+                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${!showBookCover && !showIndex && idx === chapterIdx ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
                             }`}
                           onClick={() => {
+                            setShowBookCover(false);
+                            setShowIndex(false);
                             setChapterIdx(idx);
                             setPageIdx(0);
                             setTextColIndex(0);
@@ -203,12 +304,34 @@ export default function BookReaderApp() {
                   onMouseLeave={() => setShowBookInfo(false)}
                   onClick={() => setShowBookInfo(!showBookInfo)}
                 >
-                  <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
-                    {chapter.title}
-                  </h1>
-                  <p className="text-sm text-gray-500 dark:text-gray-500 truncate">
-                    Capítulo {chapterIdx + 1}
-                  </p>
+                  {showBookCover ? (
+                    <>
+                      <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {book.title}
+                      </h1>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 truncate">
+                        {book.author}
+                      </p>
+                    </>
+                  ) : showIndex ? (
+                    <>
+                      <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        Índice
+                      </h1>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 truncate">
+                        {book.title}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {chapter.title}
+                      </h1>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 truncate">
+                        Capítulo {chapterIdx + 1}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -281,6 +404,7 @@ export default function BookReaderApp() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 mx-auto max-w-5xl flex flex-col h-full w-full min-h-0 fade-in">
@@ -290,7 +414,7 @@ export default function BookReaderApp() {
             <div
               className={`relative flex-1 overflow-hidden reading-text custom-scrollbar ${styles.readerContent} ${settings.fontFamily === 'serif' ? 'font-serif' :
                   settings.fontFamily === 'sans' ? 'font-sans' : 'font-mono'
-                } ${page?.type === 'text' ? 'p-8' : ''
+                } ${page?.type === 'text' ? 'p-8' : page?.type === 'cover' ? '' : ''
                 }`}
               style={{
                 '--reader-font-size': `${settings.fontSize}px`,
@@ -340,38 +464,172 @@ export default function BookReaderApp() {
                   fontSize={settings.fontSize}
                 />
               )}
+
+              {page?.type === "cover" && (
+                <>
+                  {page.isBookCover ? (
+                    // Main book cover with animated SVG background
+                    <div className="h-full w-full relative overflow-hidden">
+                      <BookCoverBackground />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/10 dark:bg-black/30 backdrop-blur-[1px]">
+                        <div className="text-center px-8 max-w-4xl z-10">
+                          <h1 
+                            className="font-bold text-white drop-shadow-2xl leading-tight mb-6"
+                            style={{
+                              fontSize: `${Math.min(Math.max(settings.fontSize * 3, 40), 64)}px`,
+                              lineHeight: settings.lineHeight,
+                              textShadow: '0 4px 20px rgba(0,0,0,0.5), 0 2px 10px rgba(0,0,0,0.3)'
+                            }}
+                          >
+                            {page.title}
+                          </h1>
+                          <div className="flex items-center justify-center gap-4 mt-8">
+                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-white to-transparent opacity-70 rounded-full"></div>
+                            <div className="h-2 w-2 bg-white rounded-full opacity-70"></div>
+                            <div className="h-1 w-16 bg-gradient-to-r from-transparent via-white to-transparent opacity-70 rounded-full"></div>
+                          </div>
+                          <div className="mt-8 text-white/90 text-lg font-medium drop-shadow-lg">
+                            {book.author}
+                          </div>
+                          <div className="mt-2 text-white/80 text-base drop-shadow-lg">
+                            {book.year}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Chapter cover - more subtle styling
+                    <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-800/50 dark:to-slate-800/50">
+                      <div className="text-center px-8 max-w-4xl">
+                        <div className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                          Capítulo {chapterIdx + 1}
+                        </div>
+                        <h2 
+                          className="font-semibold text-gray-800 dark:text-gray-200 leading-tight"
+                          style={{
+                            fontSize: `${Math.min(Math.max(settings.fontSize * 2, 28), 42)}px`,
+                            lineHeight: settings.lineHeight
+                          }}
+                        >
+                          {page.title}
+                        </h2>
+                        <div className="w-16 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-500 mx-auto rounded-full mt-6 opacity-60"></div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {page?.type === "index" && (
+                <div className="h-full w-full overflow-y-auto p-8">
+                  <div className="max-w-3xl mx-auto">
+                    <h1 
+                      className="font-bold text-gray-900 dark:text-gray-100 mb-2 text-center"
+                      style={{
+                        fontSize: `${Math.min(Math.max(settings.fontSize * 2.5, 32), 48)}px`,
+                        lineHeight: settings.lineHeight
+                      }}
+                    >
+                      {page.title}
+                    </h1>
+                    <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto rounded-full mb-12"></div>
+                    
+                    <div className="space-y-4">
+                      {book.chapters.map((ch, idx) => {
+                        // Calculate the page number where this chapter starts
+                        // Book cover = page 1, Index = page 2, then chapters start
+                        let startPage = 1; // Start counting from 1
+                        if (book.cover) startPage++;
+                        if (book.index) startPage++;
+                        
+                        // Add pages from previous chapters
+                        for (let i = 0; i < idx; i++) {
+                          startPage += book.chapters[i].pages.length;
+                        }
+                        
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setShowBookCover(false);
+                              setShowIndex(false);
+                              setChapterIdx(idx);
+                              setPageIdx(0);
+                              setTextColIndex(0);
+                            }}
+                            className="w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                  Capítulo {idx + 1}
+                                </div>
+                                <div 
+                                  className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                                  style={{ fontSize: `${settings.fontSize}px` }}
+                                >
+                                  {ch.title}
+                                </div>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                  Página {startPage}
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Chapter Progress Bar */}
-          <div className="px-8 py-2 border-t border-gray-200/50 dark:border-gray-700/50">
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-green-500 to-emerald-500 progress-bar rounded-full transition-all duration-500"
-                style={{
-                  width: `${((pageIdx * (page?.type === 'text' && textColCount > 1 ? textColCount : 1) +
-                    (page?.type === 'text' ? Math.min(textColIndex + 1, textColCount) : 1)) /
-                    (chapter.pages.reduce((acc, p, idx) => {
-                      // Calculate total "sections" in chapter - for text pages use textColCount, for others use 1
-                      if (p.type === 'text') {
-                        // For text pages, we need to estimate column count (use current textColCount as approximation)
-                        return acc + (textColCount > 1 ? textColCount : 1);
-                      }
-                      return acc + 1;
-                    }, 0))) * 100}%`
-                }}
-              />
+          {!showBookCover && !showIndex && (
+            <div className="px-8 py-2 border-t border-gray-200/50 dark:border-gray-700/50">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-green-500 to-emerald-500 progress-bar rounded-full transition-all duration-500"
+                  style={{
+                    width: `${((pageIdx * (page?.type === 'text' && textColCount > 1 ? textColCount : 1) +
+                      (page?.type === 'text' ? Math.min(textColIndex + 1, textColCount) : 1)) /
+                      (chapter.pages.reduce((acc, p, idx) => {
+                        // Calculate total "sections" in chapter - for text pages use textColCount, for others use 1
+                        if (p.type === 'text') {
+                          // For text pages, we need to estimate column count (use current textColCount as approximation)
+                          return acc + (textColCount > 1 ? textColCount : 1);
+                        }
+                        return acc + 1;
+                      }, 0))) * 100}%`
+                  }}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation Controls */}
-          <div className="px-8 py-4 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30">
-            <div className="flex items-center justify-between">
+          {showBookCover ? (
+            // Animated arrow button for book cover at bottom right
+            <div className="fixed bottom-8 right-8 z-50">
+              <Button
+                size="lg"
+                onClick={goNext}
+                className="h-16 w-16 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 shadow-2xl flex items-center justify-center animate-pulse hover:animate-none transition-all duration-300 hover:scale-110"
+              >
+                <ChevronRight className="h-8 w-8" />
+              </Button>
+            </div>
+          ) : (
+            <div className="px-8 py-4 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30">
+              <div className="flex items-center justify-between">
               <Button
                 size="sm"
                 onClick={goPrev}
                 variant="outline"
-                disabled={chapterIdx === 0 && pageIdx === 0 && textColIndex === 0}
+                disabled={showBookCover || (showIndex && !book.cover) || (chapterIdx === 0 && pageIdx === 0 && textColIndex === 0 && !book.cover && !book.index)}
                 className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 interactive-element enhanced-focus transition-all duration-200"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -380,18 +638,31 @@ export default function BookReaderApp() {
 
               <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
                 <div className="text-center bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-full">
-                  {/* <div className="font-medium text-gray-900 dark:text-gray-100">
-                    {page?.type === 'text' ? '📖 Lectura' : 
-                     page?.type === 'chatbot' ? '💬 Discusión' : 
-                     page?.type === 'form' ? '✍️ Actividad' : '📄 Contenido'}
-                  </div> */}
-                  <div className="text-xs mt-1">
-                    {/* {page?.type === 'text' && textColCount > 1 ? 
-                      `Sección ${Math.min(textColIndex + 1, textColCount)} de ${textColCount}` : 
-                      `Página ${pageIdx + 1} de ${chapter.pages.length}`
-                    } */}
-                    {`Página ${pageIdx + 1} de ${chapter.pages.length}`}
-                  </div>
+                  {showBookCover ? (
+                    <div className="font-medium text-gray-900 dark:text-gray-100">
+                      📚 Portada del Libro
+                    </div>
+                  ) : showIndex ? (
+                    <div className="font-medium text-gray-900 dark:text-gray-100">
+                      📑 Índice
+                    </div>
+                  ) : (
+                    <>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">
+                        {page?.type === 'cover' ? '📑 Portada' :
+                         page?.type === 'text' ? '📖 Lectura' : 
+                         page?.type === 'chatbot' ? '💬 Discusión' : 
+                         page?.type === 'form' ? '✍️ Actividad' : 
+                         page?.type === 'audio' ? '🎧 Audio' : '📄 Contenido'}
+                      </div>
+                      <div className="text-xs mt-1">
+                        {page?.type === 'text' && textColCount > 1 ? 
+                          `Sección ${Math.min(textColIndex + 1, textColCount)} de ${textColCount}` : 
+                          `Página ${pageIdx + 1} de ${chapter.pages.length}`
+                        }
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -406,6 +677,7 @@ export default function BookReaderApp() {
               </Button>
             </div>
           </div>
+          )}
         </div>
       </div>
 
