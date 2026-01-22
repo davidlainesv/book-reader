@@ -702,7 +702,7 @@ export default function BookReaderApp() {
 
               {page?.type === "biography" && (
                 <div className="h-full w-full overflow-y-auto">
-                  <div className="max-w-4xl mx-auto px-6 sm:px-8 py-12">
+                  <div className="max-w-6xl mx-auto px-6 sm:px-8 py-12">
                     <div className="mb-8 text-center">
                       <div className="inline-block">
                         <div className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">
@@ -721,20 +721,31 @@ export default function BookReaderApp() {
                       </div>
                     </div>
                     
-                    <div 
-                      className="prose prose-lg dark:prose-invert max-w-none"
-                      style={{
-                        fontSize: `${settings.fontSize}px`,
-                        lineHeight: settings.lineHeight,
-                        fontFamily: settings.fontFamily === 'serif' ? 'Georgia, serif' : 
-                                    settings.fontFamily === 'sans' ? 'system-ui, sans-serif' : 
-                                    'monospace'
-                      }}
-                    >
+                    <div className="flex flex-col md:flex-row gap-8 items-start">
+                      {page.image && (
+                        <div className="flex-shrink-0 w-full md:w-80">
+                          <img 
+                            src={page.image} 
+                            alt={page.authorName}
+                            className="w-full h-auto rounded-lg shadow-lg object-cover"
+                          />
+                        </div>
+                      )}
                       <div 
-                        className="text-gray-700 dark:text-gray-300 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: page.content }}
-                      />
+                        className="flex-1 prose prose-lg dark:prose-invert max-w-none"
+                        style={{
+                          fontSize: `${settings.fontSize}px`,
+                          lineHeight: settings.lineHeight,
+                          fontFamily: settings.fontFamily === 'serif' ? 'Georgia, serif' : 
+                                      settings.fontFamily === 'sans' ? 'system-ui, sans-serif' : 
+                                      'monospace'
+                        }}
+                      >
+                        <div 
+                          className="text-gray-700 dark:text-gray-300 leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: page.content }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

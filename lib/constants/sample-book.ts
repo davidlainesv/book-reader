@@ -69,6 +69,7 @@ export const sampleBook: Book = {
         {
           type: "biography",
           authorName: "Lic. Guillermo Narváez Osorio",
+          image: "/lic_guillermo_narvaez.jpeg",
           content: `
             <p>El Lic. Guillermo Narvaez Osorio fue electo para un segundo período como rector de la Universidad Juárez Autónoma de Tabasco el 22 de enero de 2024, para ejercer el cargo hasta enero del año 2028; tras una primera gestión que comprendió desde enero del año 2020 hasta enero del 2024.
 

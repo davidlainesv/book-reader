@@ -50,6 +50,7 @@ export type BiographyContent = {
   type: "biography";
   authorName: string;
   content: string;
+  image?: string; // Optional image URL to display on the left side
 };
 
 export type Author = {
