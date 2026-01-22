@@ -569,6 +569,8 @@ export default function BookReaderApp() {
                   fontSize={settings.fontSize}
                   answers={formAnswers}
                   setAnswers={setFormAnswers}
+                  bookId={book.id}
+                  chapterTitle={chapter.title}
                 />
               )}
 
@@ -933,12 +935,12 @@ export default function BookReaderApp() {
                   ) : (
                     <>
                       <div className="font-medium text-gray-900 dark:text-gray-100">
-                        {page?.type === 'cover' ? '📑 Portada' :
-                         page?.type === 'biography' ? '👤 Semblanza' :
-                         page?.type === 'text' ? '📖 Lectura' : 
-                         page?.type === 'chatbot' ? '💬 Discusión' : 
-                         page?.type === 'form' ? '✍️ Actividad' : 
-                         page?.type === 'audio' ? '🎧 Audio' : '📄 Contenido'}
+                        {page?.type === 'cover' ? 'Portada' :
+                         page?.type === 'biography' ? 'Semblanza' :
+                         page?.type === 'text' ? 'Lectura' : 
+                         page?.type === 'chatbot' ? 'Discusión' : 
+                         page?.type === 'form' ? 'Actividad' : 
+                         page?.type === 'audio' ? 'Audio' : 'Contenido'}
                       </div>
                       <div className="text-xs mt-1">
                         {page?.type === 'text' && textColCount > 1 ? 
