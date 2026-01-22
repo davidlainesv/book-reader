@@ -9,11 +9,54 @@ export const sampleBook: Book = {
   cover: {
     type: "cover",
     title: "UJAT 2025: Transformando vidas y sociedad a través de la ciencia",
-    isBookCover: true
+    isBookCover: true,
+  },
+  authors: {
+    type: "authors",
+    title: "Autores y Coautores",
+    authors: [
+      {
+        name: "Dr. José Ramón Laines Canepa",
+        role: "Editor y Autor Principal",
+        affiliation: "Universidad Juárez Autónoma de Tabasco",
+        bio: `<p>Doctor en Ciencias de la Computación con más de 20 años de experiencia en investigación y docencia. Coordinador del programa "Creando Conciencia" en Radio UJAT, dedica su trabajo a la divulgación científica y la vinculación universidad-sociedad.</p>`,
+      },
+      {
+        name: "Dr. José Roberto Hernández Barajas",
+        role: "Coautor y Conductor",
+        affiliation: "Universidad Juárez Autónoma de Tabasco",
+        bio: `<p>Investigador y divulgador científico comprometido con la comunicación efectiva de la ciencia. Co-conductor del programa "Creando Conciencia", especializado en hacer accesible el conocimiento científico a la comunidad.</p>`,
+      },
+      {
+        name: "Kenia Leticia Utrera Cabrera",
+        role: "Colaboradora",
+        affiliation: "Universidad Juárez Autónoma de Tabasco",
+        bio: `<p>Comunicadora y productora de contenidos científicos. Contribuye con cápsulas informativas que enriquecen el diálogo entre la ciencia y la sociedad en Radio UJAT.</p>`,
+      },
+    ],
+  },
+  acknowledgments: {
+    type: "acknowledgments",
+    title: "Agradecimientos",
+    content: `
+      <p>Este libro es el resultado de un esfuerzo colectivo que refleja el compromiso de la Universidad Juárez Autónoma de Tabasco con la ciencia, la educación y el desarrollo social.</p>
+      
+      <p>Agradecemos profundamente al <strong>Lic. Guillermo Narváez Osorio</strong>, Rector de la UJAT, por su visión transformadora y su apertura para compartir con nuestra audiencia los proyectos que están cambiando vidas en Tabasco.</p>
+      
+      <p>A la <strong>Dirección General de Comunicación Social de la UJAT</strong> y a todo el equipo de <strong>Radio UJAT 96.1 FM</strong>, por facilitar el espacio para que "Creando Conciencia" sea una realidad cada miércoles.</p>
+      
+      <p>A los <strong>investigadores, docentes y estudiantes</strong> de la UJAT que con su trabajo diario demuestran que la ciencia con sentido social no es un discurso, sino una práctica constante.</p>
+      
+      <p>A las <strong>comunidades de Tabasco</strong> —productores, apicultores, emprendedores— que confían en la universidad como aliada para resolver sus desafíos.</p>
+      
+      <p>Y especialmente a <strong>ti, lector</strong>, por tu interés en conocer cómo la ciencia puede transformar vidas y sociedad. Este libro es también tuyo.</p>
+      
+      <p className="mt-8 italic">— El equipo de "Creando Conciencia"</p>
+    `,
   },
   index: {
     type: "index",
-    title: "Índice"
+    title: "Índice",
   },
   chapters: [
     {
@@ -21,19 +64,36 @@ export const sampleBook: Book = {
       pages: [
         {
           type: "cover",
-          title: "Invitado: Lic. Guillermo Narváez Osorio, Rector de la UJAT"
+          title: "Invitado: Lic. Guillermo Narváez Osorio, Rector de la UJAT",
         } as PageContent,
         {
-          "type": "text",
-          "content": `<h1><strong>Introducción del Capítulo</strong></h1>
+          type: "biography",
+          authorName: "Lic. Guillermo Narváez Osorio",
+          content: `
+            <p>El Lic. Guillermo Narvaez Osorio fue electo para un segundo período como rector de la Universidad Juárez Autónoma de Tabasco el 22 de enero de 2024, para ejercer el cargo hasta enero del año 2028; tras una primera gestión que comprendió desde enero del año 2020 hasta enero del 2024.
+
+            <p>Cursó sus estudios profesionales en la UJAT, titulándose el 30 de enero de 1979. Posteriormente, completó cursos de capacitación, actualización y diplomados en materias como: derecho notarial y derecho administrativo.</p>
+
+            <p>Cuenta con una vasta experiencia laboral a lo largo de casi cuatro décadas de ejercicio profesional. Ha sido profesor investigador de tiempo completo de la Escuela de Derecho en nuestra Alma Máter y director de la División Académica de Ciencias Sociales y Humanidades.</p>
+
+            <p>Como parte de su trayectoria en el servicio público, se ha desempeñado como procurador de la Juventud del CREA-Tabasco; asesor jurídico de la Secretaría de Comunicaciones Asentamientos y Obras Públicas (SCAOP); director de Administración del Instituto de Vivienda de Tabasco.</p>
+
+            <p>De igual manera, ostentó el cargo de presidente municipal en su natal Tacotalpa; fue diputado local en LIV Legislatura del Congreso del Estado de Tabasco y fue notario público número 28 de 1995 a 2018.</p>
+
+            <p>Asimismo, destaca su paso como magistrado presidente de Tribunal Superior de Justicia del Estado de Tabasco, en el periodo 2000 – 2006 y Secretario de Educación de Tabasco en el año 2019.</p>
+          `,
+        } as PageContent,
+        {
+          type: "text",
+          content: `<h1><strong>Introducción del Capítulo</strong></h1>
           En el umbral del año 2025, la Universidad Juárez Autónoma de Tabasco (UJAT) se consolida como un actor transformador en el escenario científico, social y educativo de México.
           Bajo el liderazgo del rector Guillermo Narváez Osorio, esta casa de estudios ha orientado sus esfuerzos hacia una visión de ciencia con sentido social, donde la formación académica se entrelaza con la solución de problemas reales.
           En esta conversación inspiradora en el programa <strong>"Creando Conciencia"</strong>, se nos revela cómo la UJAT, a través de investigación, innovación y compromiso social, busca no solo formar profesionales, sino forjar agentes de cambio capaces de transformar su entorno.
-          Este capítulo es un testimonio de esa misión.`
+          Este capítulo es un testimonio de esa misión.`,
         } as PageContent,
         {
-          "type": "text",
-          "content": `<h1><strong>Transcripción Editada de la Entrevista</strong></h1>
+          type: "text",
+          content: `<h1><strong>Transcripción Editada de la Entrevista</strong></h1>
           En una tarde de ciencia y reflexión, los micrófonos de Radio UJAT recibieron al rector Guillermo Narváez Osorio.
           Acompañado por los doctores José Ramón Laines Canepa y José Roberto Hernández Barajas, la conversación fluía con cercanía, claridad y un tono visionario.
           “La universidad es motor de cambio”, fue la premisa que marcó el diálogo.</br>
@@ -58,24 +118,31 @@ export const sampleBook: Book = {
           
           El rector cerró su intervención con esperanza.
           Desde el cultivo de perlas hasta la creación del Centro Universitario de Biotecnología de Reproducción Bovina, cada proyecto refleja la visión de una UJAT que trasciende aulas y laboratorios.
-          “La ciencia con sentido social no es un discurso, es una promesa”, concluyó el Dr. José Ramón Laines  Canepa.`
+          “La ciencia con sentido social no es un discurso, es una promesa”, concluyó el Dr. José Ramón Laines  Canepa.`,
         } as PageContent,
         {
           type: "chatbot",
           title: "Reflexiona con la IA",
           config: {
-            persona: "You are a science explainer: clear, engaging, and practical.",
+            persona:
+              "You are a science explainer: clear, engaging, and practical.",
             instruction: `Enfócate en ¿Cómo puede una universidad pública convertirse en un motor de transformación social a través de la ciencia? 
 Analiza los casos presentados por el rector de la UJAT y compáralos con experiencias similares en América Latina.
-`
-          }
+`,
+          },
         } as PageContent,
         {
           type: "form",
           title: "Punto de Encuentro",
           fields: [
-            { type: "text", id: "q1", label: "¿Cuál es el papel que tú, como estudiante, docente o ciudadano, puedes desempeñar para que la ciencia, creada en la UJAT, con sentido social transforme tu entorno?", multiline: true },
-          ]
+            {
+              type: "text",
+              id: "q1",
+              label:
+                "¿Cuál es el papel que tú, como estudiante, docente o ciudadano, puedes desempeñar para que la ciencia, creada en la UJAT, con sentido social transforme tu entorno?",
+              multiline: true,
+            },
+          ],
         } as PageContent,
         {
           type: "audio",
@@ -630,43 +697,65 @@ Analiza los casos presentados por el rector de la UJAT y compáralos con experie
   en "Creando Conciencia", hasta la próxima.</p></br>
 
   <p><strong>LOCUTOR:</strong> "Creando Conciencia, la ciencia que transforma". Es una producción de
-  Radio UJAT, la voz universitaria. “Legado UJAT, estudio en la duda, acción en la fe”.</p></br>`
-        } as PageContent,
-        {
-          "type": "text",
-          "content": `<h1><strong>Mirada desde la Ciencia</strong></h1>
-          <h3>Por el o los entrevistados</h3>
-          [Colocar aquí un ensayo revisado de los puntos clave del capítulo].`
-        } as PageContent
-      ],
-    },
-    {
-      title: "Mujeres en la Ciencia",
-      pages: [
-        {
-          type: "cover",
-          title: "Mujeres en la Ciencia"
+  Radio UJAT, la voz universitaria. “Legado UJAT, estudio en la duda, acción en la fe”.</p></br>`,
         } as PageContent,
         {
           type: "text",
-          content: `El programa "Mujeres en la Ciencia" de la UJAT fomenta la participación femenina en áreas STEM. Este capítulo narra historias de éxito y los retos que enfrentan las mujeres científicas en la universidad.`
-        } as PageContent,
-        {
-          type: "chatbot",
-          config: {
-            persona: "You are an inspiring mentor: supportive, insightful, and empowering.",
-            instruction: `Focus on Chapter 3: ¿Por qué es importante la inclusión de mujeres en la ciencia? ¿Qué desafíos y logros se destacan en el programa de la UJAT?`
-          }
-        } as PageContent,
-        {
-          type: "form",
-          fields: [
-            { type: "text", id: "q1", label: "¿Qué historia te inspiró más?", multiline: true },
-            { type: "number", id: "q2", label: "¿Cuántas mujeres científicas conoces en tu entorno?", min: 0, max: 100 },
-            { type: "text", id: "q3", label: "¿Cómo puede la UJAT apoyar más a las mujeres en STEM?", multiline: true },
-          ]
+          content: `<h1><strong>Mirada desde la Ciencia</strong></h1>
+          <h3>Por el o los entrevistados (síntesis ensayística de los puntos clave del programa)</h3>
+          El episodio “UJAT 2025: Transformando vidas y sociedad a través de la ciencia” plantea una tesis central: la ciencia universitaria adquiere su máximo sentido cuando deja de ser un ejercicio encerrado en laboratorios y se convierte en un bien público orientado a resolver problemas concretos del territorio. Desde esta perspectiva, la Universidad Juárez Autónoma de Tabasco es presentada como una institución con doble responsabilidad: generar conocimiento y devolver a la sociedad, de manera tangible, lo que recibe del erario.
+Un primer eje del diálogo es la consolidación. El Rector subraya que 2025 no debe ser un año de improvisación, sino de continuidad estratégica: consolidar lo avanzado, reactivar laboratorios y priorizar proyectos vinculados con producción, campo e industria tabasqueña. Esta idea es relevante porque reconoce que la ciencia no solo depende del talento académico, sino también de condiciones habilitantes: infraestructura operativa, equipamiento funcional, logística y evaluación institucional que permita pasar de resultados a impacto.
+Un segundo eje es la formación científica temprana y la movilidad como detonadores de cambio. Se argumenta que programas como veranos científicos, intercambios y estancias transforman la identidad del estudiante: dejan de “ser actores de reparto” para asumir un rol protagónico como agentes de cambio. La estrategia clave para ampliar la participación no se reduce a convocatorias, sino a la difusión con el ejemplo: que quienes ya vivieron la experiencia inspiren a otros mostrando que “sí se puede”. Se propone, en suma, una pedagogía de la aspiración sustentada en evidencia vivida.
+El tercer eje, quizá el más estructurante, es la noción de investigación con sentido social. El Rector sostiene que la universidad debe salir del “claustro” y aterrizar el conocimiento en los sectores que más lo necesitan. Los ejemplos ofrecidos son ilustrativos de una ciencia aplicada con enfoque de cadena de valor: en el caso de productores de chile, la intervención universitaria no solo mejora productividad, también atiende el problema de poscosecha mediante diseño de secadores eléctricos y solares, reduciendo pérdidas y riesgos de contaminación. De manera paralela, el proyecto de producción de abeja reina busca resolver la dependencia tecnológica y la falta de adaptación al entorno tropical. Ambos casos muestran un patrón: diagnóstico del problema, diseño de solución interdisciplinaria y acompañamiento para crear capacidades locales.
+Un cuarto eje es la motivación y el sentido de pertenencia como política institucional. Se reconoce que no basta con exhortar a participar; se requiere construir conciencia social en estudiantes y profesores, recordando que la universidad pública habilita trayectorias profesionales y, por tanto, implica una ética de reciprocidad. En esta misma línea, la “fuga de talento” es tratada con madurez: no se puede forzar la permanencia, pero sí se puede generar pertenencia y proyectos de vida que vinculen el desarrollo individual con la transformación del entorno.
+El quinto eje es el reconocimiento y la escalabilidad. Se mencionan logros internacionales (eventos en Brasil, estancias, reconocimientos a impacto social) no como trofeos, sino como evidencia de que la calidad científica puede traducirse en reputación y redes. Sin embargo, la reflexión más importante no es el premio, sino el paso siguiente: convertir proyectos “escolares” o “de concurso” en proyectos productivos. Aquí aparece una exigencia institucional: la administración debe crear mecanismos para evaluar viabilidad, asignar apoyos y acompañar la implementación, evitando que buenas ideas se queden en el papel por falta de “espacios, laboratorios, equipos o transporte”.
+Finalmente, el episodio cierra con un horizonte de futuro que integra ciencia, territorio y sostenibilidad: proyectos como el cultivo de perlas con enfoque comunitario, el Centro Universitario de Biotecnología de Reproducción Bovina (CUBRE) y la Casa Universitaria del Agua se presentan como apuestas por infraestructura estratégica y, sobre todo, por una cultura científica que entiende el cambio climático y la gestión del agua como prioridades intergeneracionales. La idea final es contundente: la ciencia universitaria debe ser una herramienta para transformar vidas, no solo para producir documentos; y esa transformación ocurre cuando se enlazan talento, infraestructura, ética pública y compromiso social.
+En conjunto, este capítulo radiofónico sostiene que “crear conciencia” no es una frase retórica: es un programa de acción que demanda universidades abiertas, ciencia con pertinencia local y una comunidad académica capaz de convertir conocimiento en bienestar social.`,
         } as PageContent,
       ],
     },
+    // {
+    //   title: "Mujeres en la Ciencia",
+    //   pages: [
+    //     {
+    //       type: "cover",
+    //       title: "Mujeres en la Ciencia"
+    //     } as PageContent,
+    //     {
+    //       type: "biography",
+    //       authorName: "Mujeres Científicas de la UJAT",
+    //       content: `
+    //         <p>El programa <strong>"Mujeres en la Ciencia"</strong> de la Universidad Juárez Autónoma de Tabasco representa un esfuerzo institucional por visibilizar, impulsar y celebrar la participación femenina en las áreas STEM (Ciencia, Tecnología, Ingeniería y Matemáticas). A través de este programa, la UJAT reconoce las contribuciones de investigadoras, docentes y estudiantes que día a día rompen estereotipos y abren caminos en campos tradicionalmente masculinizados.</p>
+
+    //         <p>Las mujeres científicas de la UJAT provienen de diversas disciplinas: desde la biotecnología hasta la ingeniería ambiental, pasando por las ciencias sociales y la innovación tecnológica. Muchas de ellas compaginan la investigación de alto nivel con la docencia, la divulgación científica y el compromiso social, siendo modelos a seguir para las nuevas generaciones.</p>
+
+    //         <p>Este capítulo está dedicado a ellas: a su perseverancia, a su talento, a su capacidad de transformar la ciencia en acción concreta para el bienestar de la sociedad. Son mujeres que investigan sobre cambio climático, conservación de ecosistemas, desarrollo de tecnologías sostenibles, educación inclusiva y salud pública. Son líderes que inspiran y forman a las futuras científicas de México.</p>
+
+    //         <p>El programa no solo busca aumentar la representación femenina en la ciencia, sino también crear redes de apoyo, mentoría y colaboración que permitan a las mujeres desarrollar todo su potencial. A través de conferencias, talleres, estancias de investigación y reconocimientos, la UJAT reafirma su compromiso con la equidad de género en el ámbito científico.</p>
+
+    //         <p>Estas mujeres son la prueba viva de que la ciencia no tiene género, solo pasión, rigor y creatividad. Su legado es la inspiración para que más niñas y jóvenes se atrevan a soñar con carreras científicas y a construir un futuro donde la igualdad sea una realidad tangible.</p>
+    //       `
+    //     } as PageContent,
+    //     {
+    //       type: "text",
+    //       content: `El programa "Mujeres en la Ciencia" de la UJAT fomenta la participación femenina en áreas STEM. Este capítulo narra historias de éxito y los retos que enfrentan las mujeres científicas en la universidad.`
+    //     } as PageContent,
+    //     {
+    //       type: "chatbot",
+    //       config: {
+    //         persona: "You are an inspiring mentor: supportive, insightful, and empowering.",
+    //         instruction: `Focus on Chapter 3: ¿Por qué es importante la inclusión de mujeres en la ciencia? ¿Qué desafíos y logros se destacan en el programa de la UJAT?`
+    //       }
+    //     } as PageContent,
+    //     {
+    //       type: "form",
+    //       fields: [
+    //         { type: "text", id: "q1", label: "¿Qué historia te inspiró más?", multiline: true },
+    //         { type: "number", id: "q2", label: "¿Cuántas mujeres científicas conoces en tu entorno?", min: 0, max: 100 },
+    //         { type: "text", id: "q3", label: "¿Cómo puede la UJAT apoyar más a las mujeres en STEM?", multiline: true },
+    //       ]
+    //     } as PageContent,
+    //   ],
+    // },
   ],
 };

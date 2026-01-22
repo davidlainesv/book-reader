@@ -46,7 +46,33 @@ export type IndexContent = {
   title: string;
 };
 
-export type PageContent = TextContent | ChatbotContent | FormContent | AudioContent | CoverContent | IndexContent;
+export type BiographyContent = {
+  type: "biography";
+  authorName: string;
+  content: string;
+};
+
+export type Author = {
+  name: string;
+  role?: string; // "Autor", "Coautor", "Editor", etc.
+  bio?: string;
+  affiliation?: string;
+  photo?: string; // URL to author photo
+};
+
+export type AuthorsContent = {
+  type: "authors";
+  title: string;
+  authors: Author[];
+};
+
+export type AcknowledgmentsContent = {
+  type: "acknowledgments";
+  title: string;
+  content: string;
+};
+
+export type PageContent = TextContent | ChatbotContent | FormContent | AudioContent | CoverContent | IndexContent | BiographyContent | AuthorsContent | AcknowledgmentsContent;
 
 // Book structure
 export interface Chapter {
@@ -64,6 +90,8 @@ export interface Book {
   author: string;
   year: number;
   cover?: CoverContent; // Optional book cover
+  authors?: AuthorsContent; // Optional authors page
+  acknowledgments?: AcknowledgmentsContent; // Optional acknowledgments page
   index?: IndexContent; // Optional index page
   chapters: Chapter[];
 }
@@ -75,7 +103,10 @@ export type DisplayPage =
   | { type: "form"; fields: Field[] }
   | { type: "audio"; url: string; htmlContent: string }
   | { type: "cover"; title: string; isBookCover?: boolean }
-  | { type: "index"; title: string };
+  | { type: "index"; title: string }
+  | { type: "biography"; authorName: string; content: string }
+  | { type: "authors"; title: string; authors: Author[] }
+  | { type: "acknowledgments"; title: string; content: string };
 
 // Settings type
 export interface ReaderSettings {

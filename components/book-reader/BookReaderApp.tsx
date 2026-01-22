@@ -33,14 +33,20 @@ export default function BookReaderApp() {
 
   const [chapterIdx, setChapterIdx] = useState(0);
   const [pageIdx, setPageIdx] = useState(0);
-  const [showBookCover, setShowBookCover] = useState(book.cover ? true : false); // Show book cover initially if it exists
-  const [showIndex, setShowIndex] = useState(false); // Show index after book cover
+  const [showBookCover, setShowBookCover] = useState(book.cover ? true : false);
+  const [showAuthors, setShowAuthors] = useState(false);
+  const [showAcknowledgments, setShowAcknowledgments] = useState(false);
+  const [showIndex, setShowIndex] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
   const [formAnswers, setFormAnswers] = useState<Record<string, string | number | string[]>>({});
   const [showBookInfo, setShowBookInfo] = useState(false);
 
   const chapter = book.chapters[chapterIdx];
-  const page = showBookCover ? book.cover : showIndex ? book.index : chapter.pages[pageIdx];
+  const page = showBookCover ? book.cover : 
+               showAuthors ? book.authors :
+               showAcknowledgments ? book.acknowledgments :
+               showIndex ? book.index : 
+               chapter.pages[pageIdx];
 
   // --- Tests (lightweight) ---
   useEffect(() => {
@@ -124,9 +130,42 @@ export default function BookReaderApp() {
 
   // Navigation
   const goNext = () => {
-    // If showing book cover, go to index (if exists) or first chapter
+    // Navigation flow: Cover → Authors → Acknowledgments → Index → Chapters
+    
     if (showBookCover) {
       setShowBookCover(false);
+      if (book.authors) {
+        setShowAuthors(true);
+      } else if (book.acknowledgments) {
+        setShowAcknowledgments(true);
+      } else if (book.index) {
+        setShowIndex(true);
+      } else {
+        setChapterIdx(0);
+        setPageIdx(0);
+      }
+      setTextColIndex(0);
+      setShouldGoToLastColumn(false);
+      return;
+    }
+
+    if (showAuthors) {
+      setShowAuthors(false);
+      if (book.acknowledgments) {
+        setShowAcknowledgments(true);
+      } else if (book.index) {
+        setShowIndex(true);
+      } else {
+        setChapterIdx(0);
+        setPageIdx(0);
+      }
+      setTextColIndex(0);
+      setShouldGoToLastColumn(false);
+      return;
+    }
+
+    if (showAcknowledgments) {
+      setShowAcknowledgments(false);
       if (book.index) {
         setShowIndex(true);
       } else {
@@ -138,7 +177,6 @@ export default function BookReaderApp() {
       return;
     }
 
-    // If showing index, go to first chapter
     if (showIndex) {
       setShowIndex(false);
       setChapterIdx(0);
@@ -149,9 +187,6 @@ export default function BookReaderApp() {
     }
 
     if (page?.type === 'text') {
-      // if textColIndex = 1 and textColCount = 3, go to 2
-      // if textColIndex = 2 and textColCount = 3, go to next page
-      // if textColIndex = 2 and textColCount = 2, go to next page
       if (textColIndex < textColCount - 1) { setTextColIndex(textColIndex + 1); return; }
     }
     if (pageIdx < chapter.pages.length - 1) {
@@ -170,22 +205,48 @@ export default function BookReaderApp() {
   };
 
   const goPrev = () => {
-    // If on index, go back to book cover
-    if (showIndex && book.cover) {
-      setShowIndex(false);
-      setShowBookCover(true);
-      return;
-    }
-
-    // If showing index and no book cover, can't go back
+    // Navigation flow backwards: Chapters → Index → Acknowledgments → Authors → Cover
+    
     if (showIndex) {
+      setShowIndex(false);
+      if (book.acknowledgments) {
+        setShowAcknowledgments(true);
+      } else if (book.authors) {
+        setShowAuthors(true);
+      } else if (book.cover) {
+        setShowBookCover(true);
+      }
       return;
     }
 
-    // If on first chapter first page, go back to index or book cover
-    if (!showBookCover && chapterIdx === 0 && pageIdx === 0 && textColIndex === 0) {
+    if (showAcknowledgments) {
+      setShowAcknowledgments(false);
+      if (book.authors) {
+        setShowAuthors(true);
+      } else if (book.cover) {
+        setShowBookCover(true);
+      }
+      return;
+    }
+
+    if (showAuthors) {
+      setShowAuthors(false);
+      if (book.cover) {
+        setShowBookCover(true);
+      }
+      return;
+    }
+
+    // If on first chapter first page, go back to index, acknowledgments, authors, or cover
+    if (!showBookCover && !showAuthors && !showAcknowledgments && chapterIdx === 0 && pageIdx === 0 && textColIndex === 0) {
       if (book.index) {
         setShowIndex(true);
+        return;
+      } else if (book.acknowledgments) {
+        setShowAcknowledgments(true);
+        return;
+      } else if (book.authors) {
+        setShowAuthors(true);
         return;
       } else if (book.cover) {
         setShowBookCover(true);
@@ -230,8 +291,8 @@ export default function BookReaderApp() {
 
   return (
     <div className="w-full bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-slate-800 text-foreground flex flex-col" style={{ height: '100dvh' }}>
-      {/* Modern Header - Hidden on book cover and index */}
-      {!showBookCover && !showIndex && (
+      {/* Modern Header - Hidden on special pages */}
+      {!showBookCover && !showAuthors && !showAcknowledgments && !showIndex && (
         <div className="h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
         <div className="px-4 h-full flex items-center">
           <div className="flex items-center justify-between w-full">
@@ -254,6 +315,8 @@ export default function BookReaderApp() {
                             }`}
                           onClick={() => {
                             setShowBookCover(true);
+                            setShowAuthors(false);
+                            setShowAcknowledgments(false);
                             setShowIndex(false);
                             setChapterIdx(0);
                             setPageIdx(0);
@@ -265,6 +328,46 @@ export default function BookReaderApp() {
                         </button>
                       </DialogClose>
                     )}
+                    {book.authors && (
+                      <DialogClose asChild>
+                        <button
+                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${showAuthors ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
+                            }`}
+                          onClick={() => {
+                            setShowBookCover(false);
+                            setShowAuthors(true);
+                            setShowAcknowledgments(false);
+                            setShowIndex(false);
+                            setChapterIdx(0);
+                            setPageIdx(0);
+                            setTextColIndex(0);
+                          }}
+                        >
+                          <div className="text-sm font-medium">✍️ {book.authors.title}</div>
+                          <div className="text-xs text-muted-foreground mt-1">Autores y coautores</div>
+                        </button>
+                      </DialogClose>
+                    )}
+                    {book.acknowledgments && (
+                      <DialogClose asChild>
+                        <button
+                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${showAcknowledgments ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
+                            }`}
+                          onClick={() => {
+                            setShowBookCover(false);
+                            setShowAuthors(false);
+                            setShowAcknowledgments(true);
+                            setShowIndex(false);
+                            setChapterIdx(0);
+                            setPageIdx(0);
+                            setTextColIndex(0);
+                          }}
+                        >
+                          <div className="text-sm font-medium">🙏 {book.acknowledgments.title}</div>
+                          <div className="text-xs text-muted-foreground mt-1">Agradecimientos</div>
+                        </button>
+                      </DialogClose>
+                    )}
                     {book.index && (
                       <DialogClose asChild>
                         <button
@@ -272,6 +375,8 @@ export default function BookReaderApp() {
                             }`}
                           onClick={() => {
                             setShowBookCover(false);
+                            setShowAuthors(false);
+                            setShowAcknowledgments(false);
                             setShowIndex(true);
                             setChapterIdx(0);
                             setPageIdx(0);
@@ -286,10 +391,12 @@ export default function BookReaderApp() {
                     {book.chapters.map((ch, idx) => (
                       <DialogClose key={idx} asChild>
                         <button
-                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${!showBookCover && !showIndex && idx === chapterIdx ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
+                          className={`w-full text-left p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${!showBookCover && !showAuthors && !showAcknowledgments && !showIndex && idx === chapterIdx ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium' : ''
                             }`}
                           onClick={() => {
                             setShowBookCover(false);
+                            setShowAuthors(false);
+                            setShowAcknowledgments(false);
                             setShowIndex(false);
                             setChapterIdx(idx);
                             setPageIdx(0);
@@ -592,11 +699,161 @@ export default function BookReaderApp() {
                   </div>
                 </div>
               )}
+
+              {page?.type === "biography" && (
+                <div className="h-full w-full overflow-y-auto">
+                  <div className="max-w-4xl mx-auto px-6 sm:px-8 py-12">
+                    <div className="mb-8 text-center">
+                      <div className="inline-block">
+                        <div className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">
+                          Semblanza del Autor
+                        </div>
+                        <h2 
+                          className="font-bold text-gray-900 dark:text-gray-100"
+                          style={{
+                            fontSize: `${Math.min(Math.max(settings.fontSize * 1.8, 28), 40)}px`,
+                            lineHeight: settings.lineHeight
+                          }}
+                        >
+                          {page.authorName}
+                        </h2>
+                        <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto rounded-full mt-4"></div>
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className="prose prose-lg dark:prose-invert max-w-none"
+                      style={{
+                        fontSize: `${settings.fontSize}px`,
+                        lineHeight: settings.lineHeight,
+                        fontFamily: settings.fontFamily === 'serif' ? 'Georgia, serif' : 
+                                    settings.fontFamily === 'sans' ? 'system-ui, sans-serif' : 
+                                    'monospace'
+                      }}
+                    >
+                      <div 
+                        className="text-gray-700 dark:text-gray-300 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: page.content }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {page?.type === "authors" && (
+                <div className="h-full w-full overflow-y-auto">
+                  <div className="max-w-5xl mx-auto px-6 sm:px-8 py-12">
+                    <div className="mb-12 text-center">
+                      <h1 
+                        className="font-bold text-gray-900 dark:text-gray-100"
+                        style={{
+                          fontSize: `${Math.min(Math.max(settings.fontSize * 2.2, 32), 48)}px`,
+                          lineHeight: settings.lineHeight
+                        }}
+                      >
+                        {page.title}
+                      </h1>
+                      <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full mt-6"></div>
+                    </div>
+                    
+                    <div className="grid gap-8 md:grid-cols-2">
+                      {page.authors.map((author, idx) => (
+                        <div 
+                          key={idx}
+                          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow"
+                        >
+                          <div className="flex flex-col items-center text-center">
+                            {author.photo && (
+                              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 p-1 mb-4">
+                                <img 
+                                  src={author.photo} 
+                                  alt={author.name}
+                                  className="w-full h-full rounded-full object-cover bg-white dark:bg-gray-800"
+                                />
+                              </div>
+                            )}
+                            <h3 
+                              className="font-bold text-gray-900 dark:text-gray-100 mb-2"
+                              style={{
+                                fontSize: `${Math.min(Math.max(settings.fontSize * 1.2, 20), 28)}px`,
+                                lineHeight: settings.lineHeight
+                              }}
+                            >
+                              {author.name}
+                            </h3>
+                            {author.role && (
+                              <div 
+                                className="text-purple-600 dark:text-purple-400 font-medium mb-3"
+                                style={{ fontSize: `${settings.fontSize * 0.9}px` }}
+                              >
+                                {author.role}
+                              </div>
+                            )}
+                            {author.affiliation && (
+                              <div 
+                                className="text-gray-600 dark:text-gray-400 mb-4"
+                                style={{ fontSize: `${settings.fontSize * 0.85}px` }}
+                              >
+                                {author.affiliation}
+                              </div>
+                            )}
+                            {author.bio && (
+                              <div 
+                                className="text-gray-700 dark:text-gray-300 text-left"
+                                style={{
+                                  fontSize: `${settings.fontSize * 0.9}px`,
+                                  lineHeight: settings.lineHeight
+                                }}
+                                dangerouslySetInnerHTML={{ __html: author.bio }}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {page?.type === "acknowledgments" && (
+                <div className="h-full w-full overflow-y-auto">
+                  <div className="max-w-4xl mx-auto px-6 sm:px-8 py-12">
+                    <div className="mb-12 text-center">
+                      <h1 
+                        className="font-bold text-gray-900 dark:text-gray-100"
+                        style={{
+                          fontSize: `${Math.min(Math.max(settings.fontSize * 2.2, 32), 48)}px`,
+                          lineHeight: settings.lineHeight
+                        }}
+                      >
+                        {page.title}
+                      </h1>
+                      <div className="w-24 h-1 bg-gradient-to-r from-amber-500 to-orange-500 mx-auto rounded-full mt-6"></div>
+                    </div>
+                    
+                    <div 
+                      className="prose prose-lg dark:prose-invert max-w-none"
+                      style={{
+                        fontSize: `${settings.fontSize}px`,
+                        lineHeight: settings.lineHeight,
+                        fontFamily: settings.fontFamily === 'serif' ? 'Georgia, serif' : 
+                                    settings.fontFamily === 'sans' ? 'system-ui, sans-serif' : 
+                                    'monospace'
+                      }}
+                    >
+                      <div 
+                        className="text-gray-700 dark:text-gray-300 leading-relaxed text-center"
+                        dangerouslySetInnerHTML={{ __html: page.content }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Chapter Progress Bar */}
-          {!showBookCover && !showIndex && (
+          {!showBookCover && !showAuthors && !showAcknowledgments && !showIndex && (
             <div className="px-8 py-2 border-t border-gray-200/50 dark:border-gray-700/50">
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
                 <div
@@ -637,7 +894,7 @@ export default function BookReaderApp() {
                 size="sm"
                 onClick={goPrev}
                 variant="outline"
-                disabled={showBookCover || (showIndex && !book.cover) || (chapterIdx === 0 && pageIdx === 0 && textColIndex === 0 && !book.cover && !book.index)}
+                disabled={showBookCover || (showAuthors && !book.cover) || (!showBookCover && !showAuthors && !showAcknowledgments && !showIndex && chapterIdx === 0 && pageIdx === 0 && textColIndex === 0 && !book.cover && !book.authors && !book.acknowledgments && !book.index)}
                 className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 interactive-element enhanced-focus transition-all duration-200"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -650,6 +907,14 @@ export default function BookReaderApp() {
                     <div className="font-medium text-gray-900 dark:text-gray-100">
                       📚 Portada del Libro
                     </div>
+                  ) : showAuthors ? (
+                    <div className="font-medium text-gray-900 dark:text-gray-100">
+                      ✍️ Autores
+                    </div>
+                  ) : showAcknowledgments ? (
+                    <div className="font-medium text-gray-900 dark:text-gray-100">
+                      🙏 Agradecimientos
+                    </div>
                   ) : showIndex ? (
                     <div className="font-medium text-gray-900 dark:text-gray-100">
                       📑 Índice
@@ -658,6 +923,7 @@ export default function BookReaderApp() {
                     <>
                       <div className="font-medium text-gray-900 dark:text-gray-100">
                         {page?.type === 'cover' ? '📑 Portada' :
+                         page?.type === 'biography' ? '👤 Semblanza' :
                          page?.type === 'text' ? '📖 Lectura' : 
                          page?.type === 'chatbot' ? '💬 Discusión' : 
                          page?.type === 'form' ? '✍️ Actividad' : 
