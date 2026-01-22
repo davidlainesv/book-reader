@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
@@ -7,7 +7,7 @@ import { ChatMsg, ChatbotConfig } from "@/lib/types/book";
 import { buildSystemPrompt, callLLMStream } from "@/lib/api/chat";
 
 interface ChatbotPageProps {
-  chapterTitle: string;
+  title: string;
   config: ChatbotConfig;
   messages: ChatMsg[];
   setMessages: React.Dispatch<React.SetStateAction<ChatMsg[]>>;
@@ -15,7 +15,7 @@ interface ChatbotPageProps {
 }
 
 export default function ChatbotPage({
-  chapterTitle,
+  title,
   config,
   messages,
   setMessages,
@@ -30,7 +30,12 @@ export default function ChatbotPage({
     // Only initialize with a message if we have a valid setMessages function
     if ((!messages || messages.length === 0) && setMessages) {
       try {
-        setMessages([{ role: "assistant", content: "¿Qué te llamó más la atención en este capítulo?" }]);
+        setMessages([
+          {
+            role: "assistant",
+            content: "¿Qué te llamó más la atención en este capítulo?",
+          },
+        ]);
       } catch (err) {
         console.error("Error initializing chat messages:", err);
       }
@@ -40,7 +45,10 @@ export default function ChatbotPage({
 
   // Update the font size for chatbot content
   useEffect(() => {
-    document.documentElement.style.setProperty('--reader-font-size', `${fontSize}px`);
+    document.documentElement.style.setProperty(
+      "--reader-font-size",
+      `${fontSize}px`,
+    );
   }, [fontSize]);
 
   useEffect(() => {
@@ -50,8 +58,9 @@ export default function ChatbotPage({
   // Auto-resize textarea based on content
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px';
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        Math.min(textareaRef.current.scrollHeight, 120) + "px";
     }
   }, [input]);
 
@@ -59,7 +68,7 @@ export default function ChatbotPage({
     const text = input.trim();
     if (!text || isGeneratingResponse) return;
     setIsGeneratingResponse(true);
-    const systemPrompt = buildSystemPrompt(config, chapterTitle);
+    const systemPrompt = buildSystemPrompt(config, title);
 
     // add user message
     setMessages((prev) => [...prev, { role: "user", content: text }]);
@@ -72,7 +81,11 @@ export default function ChatbotPage({
       return [...prev, { role: "assistant", content: "" }];
     });
 
-    const convo: ChatMsg[] = [{ role: "assistant", content: systemPrompt }, ...messages, { role: "user", content: text }];
+    const convo: ChatMsg[] = [
+      { role: "assistant", content: systemPrompt },
+      ...messages,
+      { role: "user", content: text },
+    ];
 
     const appendToken = (tok: string) => {
       if (tok.trim().length === 0) return; // Skip empty tokens
@@ -83,7 +96,10 @@ export default function ChatbotPage({
         const copy = [...prev];
         const last = copy[assistantIndex] || { role: "assistant", content: "" };
         // Directly append token without any additional processing
-        copy[assistantIndex] = { role: "assistant", content: (last.content || "") + tok };
+        copy[assistantIndex] = {
+          role: "assistant",
+          content: (last.content || "") + tok,
+        };
         return copy;
       });
     };
@@ -94,14 +110,18 @@ export default function ChatbotPage({
   const controlClass = `custom-font-size custom-line-height`;
 
   return (
-    <div className="h-full w-full flex flex-col bg-gradient-to-b from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg font-sans">
+    <div className="h-full w-full flex flex-col bg-gradient-to-b from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/20 dark:to-violet-950/20 rounded-lg font-sans">
       {/* Chat Header */}
-      <div className="px-4 py-3 pt-1.5 border-b border-blue-200/50 dark:border-blue-800/50 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-t-lg">
-        <h1 className={`text-2xl font-bold text-blue-900 dark:text-blue-100 ${controlClass}`}
-          style={{ fontSize: `${Math.max(fontSize * 1.3, 24)}px` }}>
-          Reflexiona con Nosotros
+      <div className="px-4 py-3 pt-1.5 border-b border-indigo-200/50 dark:border-indigo-800/50 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-t-lg">
+        <h1
+          className={`text-2xl font-bold text-indigo-900 dark:text-indigo-100 ${controlClass}`}
+          style={{ fontSize: `${Math.max(fontSize * 1.3, 24)}px` }}
+        >
+          {title}
         </h1>
-        <p className="text-sm text-blue-700 dark:text-blue-300">Reflexiona sobre lo que has Aprendido Creando Conciencia</p>
+        <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1">
+          Reflexiona sobre lo que has Aprendido Creando Conciencia
+        </p>
       </div>
 
       {/* Messages Area */}
@@ -110,10 +130,11 @@ export default function ChatbotPage({
           <div
             hidden={m.content.trim().length === 0}
             key={idx}
-            className={`max-w-[85%] rounded-2xl px-4 py-3 text-base shadow-sm ${m.role === "assistant"
+            className={`max-w-[85%] rounded-2xl px-4 py-3 text-base shadow-sm ${
+              m.role === "assistant"
                 ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200/50 dark:border-gray-700/50"
-                : "bg-blue-500 text-white ml-auto shadow-md"
-              }`}
+                : "bg-indigo-500 text-white ml-auto shadow-md"
+            }`}
           >
             <div className="leading-relaxed">{m.content}</div>
           </div>
@@ -123,9 +144,9 @@ export default function ChatbotPage({
             <div className="flex items-center gap-2">
               <span className="text-sm opacity-70">Generando respuesta</span>
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce opacity-60 [animation-delay:0ms]"></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce opacity-60 [animation-delay:150ms]"></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce opacity-60 [animation-delay:300ms]"></div>
+                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce opacity-60 [animation-delay:0ms]"></div>
+                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce opacity-60 [animation-delay:150ms]"></div>
+                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce opacity-60 [animation-delay:300ms]"></div>
               </div>
             </div>
           </div>
@@ -133,7 +154,7 @@ export default function ChatbotPage({
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-blue-200/50 dark:border-blue-800/50 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-b-lg">
+      <div className="p-4 border-t border-indigo-200/50 dark:border-indigo-800/50 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-b-lg">
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden relative">
           <div className="flex items-end gap-2 p-3">
             <textarea
@@ -150,14 +171,14 @@ export default function ChatbotPage({
               }}
               disabled={isGeneratingResponse}
               rows={1}
-              style={{ height: 'auto', fontSize: '16px' }}
+              style={{ height: "auto", fontSize: "16px" }}
             />
             <Button
               onClick={onSend}
               size="icon"
               aria-label="Send message"
               disabled={isGeneratingResponse || !input.trim()}
-              className="h-8 w-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-50 flex-shrink-0 self-end"
+              className="h-8 w-8 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white disabled:opacity-50 flex-shrink-0 self-end"
             >
               <Send className="h-4 w-4" />
             </Button>

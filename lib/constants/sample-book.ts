@@ -2,7 +2,7 @@ import { Book, PageContent } from "@/lib/types/book";
 
 // Sample book with per-chapter chatbot + form (5 questions)
 export const sampleBook: Book = {
-  id: "alice-in-wonderland",
+  id: "creando-conciencia-ujat-2025",
   title: "UJAT 2025: Transformando vidas y sociedad a través de la ciencia",
   author: "Dr. José Ramón Laines Canepa",
   year: 2025,
@@ -40,17 +40,18 @@ export const sampleBook: Book = {
     title: "Agradecimientos",
     content: `
       <p>Este libro es el resultado de un esfuerzo colectivo que refleja el compromiso de la Universidad Juárez Autónoma de Tabasco con la ciencia, la educación y el desarrollo social.</p>
-      
+      <br>
       <p>Agradecemos profundamente al <strong>Lic. Guillermo Narváez Osorio</strong>, Rector de la UJAT, por su visión transformadora y su apertura para compartir con nuestra audiencia los proyectos que están cambiando vidas en Tabasco.</p>
-      
+      <br>
       <p>A la <strong>Dirección General de Comunicación Social de la UJAT</strong> y a todo el equipo de <strong>Radio UJAT 96.1 FM</strong>, por facilitar el espacio para que "Creando Conciencia" sea una realidad cada miércoles.</p>
-      
+      <br>
       <p>A los <strong>investigadores, docentes y estudiantes</strong> de la UJAT que con su trabajo diario demuestran que la ciencia con sentido social no es un discurso, sino una práctica constante.</p>
-      
+      <br>
       <p>A las <strong>comunidades de Tabasco</strong> —productores, apicultores, emprendedores— que confían en la universidad como aliada para resolver sus desafíos.</p>
-      
+      <br>
       <p>Y especialmente a <strong>ti, lector</strong>, por tu interés en conocer cómo la ciencia puede transformar vidas y sociedad. Este libro es también tuyo.</p>
-      
+      <br>
+      <br>
       <p className="mt-8 italic">— El equipo de "Creando Conciencia"</p>
     `,
   },
@@ -71,17 +72,17 @@ export const sampleBook: Book = {
           authorName: "Lic. Guillermo Narváez Osorio",
           image: "/lic_guillermo_narvaez.jpeg",
           content: `
-            <p>El Lic. Guillermo Narvaez Osorio fue electo para un segundo período como rector de la Universidad Juárez Autónoma de Tabasco el 22 de enero de 2024, para ejercer el cargo hasta enero del año 2028; tras una primera gestión que comprendió desde enero del año 2020 hasta enero del 2024.
-
+            <p>El Lic. Guillermo Narvaez Osorio fue electo para un segundo período como rector de la Universidad Juárez Autónoma de Tabasco el 22 de enero de 2024, para ejercer el cargo hasta enero del año 2028; tras una primera gestión que comprendió desde enero del año 2020 hasta enero del 2024.</p>
+            <br>
             <p>Cursó sus estudios profesionales en la UJAT, titulándose el 30 de enero de 1979. Posteriormente, completó cursos de capacitación, actualización y diplomados en materias como: derecho notarial y derecho administrativo.</p>
-
+            <br>
             <p>Cuenta con una vasta experiencia laboral a lo largo de casi cuatro décadas de ejercicio profesional. Ha sido profesor investigador de tiempo completo de la Escuela de Derecho en nuestra Alma Máter y director de la División Académica de Ciencias Sociales y Humanidades.</p>
-
+            <br>
             <p>Como parte de su trayectoria en el servicio público, se ha desempeñado como procurador de la Juventud del CREA-Tabasco; asesor jurídico de la Secretaría de Comunicaciones Asentamientos y Obras Públicas (SCAOP); director de Administración del Instituto de Vivienda de Tabasco.</p>
-
+            <br>
             <p>De igual manera, ostentó el cargo de presidente municipal en su natal Tacotalpa; fue diputado local en LIV Legislatura del Congreso del Estado de Tabasco y fue notario público número 28 de 1995 a 2018.</p>
-
-            <p>Asimismo, destaca su paso como magistrado presidente de Tribunal Superior de Justicia del Estado de Tabasco, en el periodo 2000 – 2006 y Secretario de Educación de Tabasco en el año 2019.</p>
+            <br>
+            <p>Asimismo, destaca su paso como magistrado presidente de Tribunal Superior de Justicia del Estado de Tabasco, en el periodo 2000 - 2006 y Secretario de Educación de Tabasco en el año 2019.</p>
           `,
         } as PageContent,
         {
@@ -123,7 +124,7 @@ export const sampleBook: Book = {
         } as PageContent,
         {
           type: "chatbot",
-          title: "Reflexiona con la IA",
+          title: "Reflexiona con Nosotros",
           config: {
             persona:
               "You are a science explainer: clear, engaging, and practical.",

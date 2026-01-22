@@ -20,6 +20,7 @@ export type TextContent = {
 
 export type ChatbotContent = {
   type: "chatbot";
+  title: string;
   config?: ChatbotConfig;
 };
 

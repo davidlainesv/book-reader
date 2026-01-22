@@ -218,3 +218,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Theme Palette - Consistent accent colors across the app */
+:root {
+  /* Primary accent - Blue/Indigo */
+  --theme-primary-50: oklch(0.97 0.02 264);
+  --theme-primary-100: oklch(0.93 0.04 264);
+  --theme-primary-200: oklch(0.87 0.08 264);
+  --theme-primary-300: oklch(0.73 0.15 264);
+  --theme-primary-400: oklch(0.59 0.21 264);
+  --theme-primary-500: oklch(0.51 0.24 264);
+  --theme-primary-600: oklch(0.45 0.22 264);
+  --theme-primary-700: oklch(0.39 0.19 264);
+  --theme-primary-800: oklch(0.33 0.15 264);
+  --theme-primary-900: oklch(0.27 0.11 264);
+  --theme-primary-950: oklch(0.20 0.08 264);
+
+  /* Secondary accent - Emerald/Teal for forms/success */
+  --theme-secondary-50: oklch(0.97 0.02 168);
+  --theme-secondary-100: oklch(0.93 0.04 168);
+  --theme-secondary-200: oklch(0.87 0.08 168);
+  --theme-secondary-500: oklch(0.60 0.15 168);
+  --theme-secondary-600: oklch(0.52 0.14 168);
+  --theme-secondary-700: oklch(0.45 0.12 168);
+
+  /* Tertiary accent - Purple for audio/media */
+  --theme-tertiary-50: oklch(0.97 0.02 300);
+  --theme-tertiary-100: oklch(0.93 0.04 300);
+  --theme-tertiary-200: oklch(0.87 0.08 300);
+  --theme-tertiary-500: oklch(0.55 0.20 300);
+  --theme-tertiary-600: oklch(0.48 0.18 300);
+  --theme-tertiary-700: oklch(0.42 0.16 300);
+}
