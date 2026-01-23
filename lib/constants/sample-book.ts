@@ -163,7 +163,7 @@ Analiza los casos presentados por el rector de la UJAT y compáralos con experie
   <p><strong>DR. ROBERTO HERNANDEZ BARAJAS:</strong> Roberto Hernandez Barajas, buenas tardes,
   Ramón, muy buenas tardes a toda la audiencia de Radio UJAT.</p></br>
 
-  <p><strong>DR. JOSÉ RAMÓN LAINES CANEPA:</strong> Gracias por estar con nosotros para que juntos
+  <p><strong>JRLC:</strong> Gracias por estar con nosotros para que juntos
   conozcamos lo más relevante de la ciencia, pensar de manera crítica y actuar de forma
   consciente en el cuidado de nuestro planeta. Así que prepárate, recuerda puedes
   interactuar con nosotros a través de nuestras redes sociales y ser parte activa de esta
